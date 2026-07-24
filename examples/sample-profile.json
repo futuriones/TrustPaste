@@ -1,0 +1,602 @@
+{
+  "company": {
+    "brand_name": "Futurion Solutions",
+    "legal_name": "Futurion Solutions S.L.",
+    "NIF_CIF": "B90451234",
+    "website": "https://solutions.futurion.es/",
+    "email": "solutions@futurion.es",
+    "country": "Spain",
+    "country_es": "España",
+    "country_code": "ES",
+    "city": "Valencia",
+    "region": "Comunidad Valenciana",
+    "location": "Valencia, Spain",
+    "service_area": {
+      "en": "Spain and the European Union",
+      "es": "España y la Unión Europea"
+    },
+    "coverage": "Organisations across Spain and the European Union",
+    "languages": "English and Spanish",
+    "category": "Private AI and governed automation",
+    "core_proposition": "Private AI and governed automation for organisations that need sensitive data and critical workflows to remain under their control",
+    "identity": {
+      "en": [
+        "Futurion Solutions owns its software products; SMSEagle hardware is built by SMSEagle and supplied and integrated by Futurion Solutions.",
+        "Architecture follows the process, data boundary and risk.",
+        "Customers retain authority over infrastructure, system access, business records and decisions that require judgement."
+      ],
+      "es": [
+        "Futurion Solutions es titular de sus productos de software; SMSEagle fabrica el hardware, que Futurion Solutions suministra e integra.",
+        "La arquitectura se elige según el proceso, el límite de los datos y el riesgo.",
+        "Los clientes conservan el control de la infraestructura, el acceso a los sistemas, los registros de negocio y las decisiones que exigen criterio."
+      ]
+    }
+  },
+  "founder": {
+    "name": "Ivan Skachkov",
+    "role": "Founder",
+    "bio": {
+      "en": {
+        "bio_160": "Ivan Skachkov founded Futurion Solutions. His background combines data protection and business-process design with enterprise IT and infrastructure experience.",
+        "bio_300": "Ivan Skachkov founded Futurion Solutions. His background covers data protection, process design, enterprise IT operations, infrastructure architecture, security controls, Microsoft 365, Power Automate, AWS, identity and access management, monitoring and business continuity.",
+        "bio_500": "Ivan Skachkov founded Futurion Solutions. His background covers data protection and business-process design, the disciplines shaping the company's process approach. His experience includes enterprise IT operations, infrastructure architecture, local and cloud environments, security controls, audit evidence, service management, continuity, automation and vendor management, with practical work in Microsoft 365, Power Automate, AWS, identity and access management and monitoring."
+      },
+      "es": {
+        "bio_160": "Ivan Skachkov fundó Futurion Solutions. Su trayectoria combina protección de datos y diseño de procesos de negocio con experiencia en TI e infraestructura.",
+        "bio_300": "Ivan Skachkov fundó Futurion Solutions. Su trayectoria abarca protección de datos, diseño de procesos, operaciones de TI, arquitectura de infraestructura, controles de seguridad, Microsoft 365, Power Automate, AWS, gestión de identidades, monitorización y continuidad de negocio.",
+        "bio_500": "Ivan Skachkov fundó Futurion Solutions. Su trayectoria abarca la protección de datos y el diseño de procesos de negocio, disciplinas que definen el enfoque de la empresa. Cuenta con experiencia en operaciones de TI, arquitectura de infraestructura, entornos locales y en la nube, controles de seguridad, evidencias de auditoría, gestión de servicios, continuidad, automatización y proveedores, además de trabajo práctico con Microsoft 365, Power Automate, AWS, identidades y monitorización."
+      }
+    }
+  },
+  "descriptions": {
+    "en": {
+      "tagline": "Private AI and governed automation, under your control",
+      "company_80": "Private AI and governed automation that keep sensitive data under your control.",
+      "company_160": "Futurion Solutions provides private AI and governed automation for legal, healthcare and other organisations that keep sensitive data under their control.",
+      "company_300": "Futurion Solutions provides private AI and governed automation for legal, healthcare and other organisations handling sensitive data. Local products, on-premises healthcare AI and process-led services help customers across Spain and the EU retain control of their data and workflows.",
+      "company_500": "Futurion Solutions provides private AI and governed automation for organisations that need sensitive data and critical workflows to remain under their control. Its portfolio includes browser-local redaction with TrustPrompt, local document intelligence with TrustCore, governed process automation with TrustAuto and fully on-premises healthcare AI with MedCore Private AI. Based in Valencia, it serves legal, healthcare and other organisations across Spain and the EU in English and Spanish.",
+      "one_sentence": "Futurion Solutions provides private AI and governed automation that help organisations retain control of sensitive data, critical workflows and accountable decisions.",
+      "boilerplate": "Futurion Solutions provides private AI and governed automation for legal, healthcare and other organisations handling sensitive data. Its local-oriented products, fully on-premises infrastructure and process-led services help customers across Spain and the EU retain control of information, systems and accountable decisions."
+    },
+    "es": {
+      "tagline": "IA privada y automatización gobernada, bajo su control",
+      "company_80": "IA privada y automatización gobernada con los datos siempre bajo su control.",
+      "company_160": "Futurion Solutions ofrece IA privada y automatización gobernada para entidades jurídicas, sanitarias y de otros sectores que controlan sus datos.",
+      "company_300": "Futurion Solutions ofrece IA privada y automatización gobernada para organizaciones jurídicas, sanitarias y de otros sectores que manejan datos sensibles. Sus productos local, su IA sanitaria on-premise y sus servicios ayudan a clientes de España y la UE a controlar sus datos y procesos.",
+      "company_500": "Futurion Solutions ofrece IA privada y automatización gobernada para organizaciones que necesitan mantener bajo su control los datos sensibles y los flujos críticos. Su porfolio incluye redacción local en el navegador con TrustPrompt, inteligencia documental local con TrustCore, automatización gobernada con TrustAuto e IA sanitaria totalmente on-premise con MedCore Private AI. Con sede en Valencia, atiende en inglés y español a clientes de España y la UE.",
+      "one_sentence": "Futurion Solutions ofrece IA privada y automatización gobernada para que las organizaciones controlen sus datos sensibles, flujos críticos y decisiones.",
+      "boilerplate": "Futurion Solutions ofrece IA privada y automatización gobernada para organizaciones jurídicas, sanitarias y de otros sectores que manejan datos sensibles. Sus productos de orientación local, su infraestructura totalmente on-premise y sus servicios ayudan a clientes de España y la UE a controlar la información, los sistemas y las decisiones."
+    }
+  },
+  "products": {
+    "trustprompt": {
+      "name": "TrustPrompt",
+      "website": "https://solutions.futurion.es/products/trustprompt/",
+      "version": "0.2.1",
+      "category": "Browser extension (Chrome/Edge, Manifest V3)",
+      "tagline": {
+        "en": "Local PII redaction before your prompt reaches a public AI model",
+        "es": "Redacción local de datos personales antes de que su prompt llegue a una IA pública"
+      },
+      "description_80": {
+        "en": "Local personal-data redaction before prompts reach supported public AI tools.",
+        "es": "Ocultación local de datos personales antes de usar herramientas públicas de IA."
+      },
+      "description_160": {
+        "en": "TrustPrompt detects and redacts personal data locally in the browser before a prompt is sent to supported public AI tools.",
+        "es": "TrustPrompt detecta y oculta datos personales en local, dentro del navegador, antes de enviar un prompt a herramientas públicas de IA compatibles."
+      },
+      "description_300": {
+        "en": "TrustPrompt is a Chrome and Edge extension that blocks the native send, detects personal or identifying data on the user’s device, shows a preview and replaces detected values with typed placeholders. The sanitised prompt may then be sent to the public AI service chosen by the user.",
+        "es": "TrustPrompt es una extensión para Chrome y Edge que bloquea el envío, detecta datos personales o identificativos en el equipo, muestra una vista previa y sustituye los valores por marcadores tipados. Después, el prompt saneado puede enviarse al servicio público de IA elegido por el usuario."
+      },
+      "description_500": {
+        "en": "TrustPrompt detects and redacts personal or identifying data inside Chrome or Edge before a prompt is sent to a supported public LLM. Detection combines checksum-validated rules with an on-device multilingual NER model. Detected values become typed placeholders, and the mapping stays only in the tab’s memory. There is no detection server or telemetry. The sanitised prompt may leave the device for processing by the public AI service selected by the user.",
+        "es": "TrustPrompt detecta y oculta datos personales o identificativos en Chrome o Edge antes de enviar un prompt a una IA pública compatible. Combina reglas con validación de checksum y un modelo NER multilingüe ejecutado en el equipo. Los valores se sustituyen por marcadores tipados y el mapa solo permanece en la memoria de la pestaña. No hay servidor de detección ni telemetría. El prompt saneado puede salir del dispositivo hacia el servicio público elegido."
+      },
+      "deployment_boundary": {
+        "en": "Original text is detected and redacted locally; the sanitised prompt may be sent to the public service selected by the user.",
+        "es": "El texto original se detecta y oculta en local; el prompt saneado puede enviarse al servicio público que elija el usuario."
+      },
+      "capabilities": {
+        "en": [
+          "Blocks the native send until detection, preview and redaction finish",
+          "Replaces detected spans with consistent typed placeholders",
+          "Uses 40 built-in rules with checks for structured identifiers and secrets",
+          "Runs a 560-million-parameter multilingual NER model on the user’s machine",
+          "Supports a personal watchlist of terms that must always be redacted",
+          "Learns false-positive decisions on the device",
+          "Keeps the send blocked by default if the privacy pipeline fails",
+          "Enterprise policy supports categories, thresholds, regex rules and backend selection",
+          "Optional enterprise audit logging contains metadata, never prompt text or detected values"
+        ],
+        "es": [
+          "Bloquea el envío original hasta finalizar la detección, la vista previa y la ocultación",
+          "Sustituye los fragmentos detectados por marcadores tipados coherentes",
+          "Usa 40 reglas integradas con comprobaciones para identificadores estructurados y secretos",
+          "Ejecuta en el equipo un modelo NER multilingüe de 560 millones de parámetros",
+          "Admite una lista personal de términos que siempre deben ocultarse",
+          "Aprende en el dispositivo las decisiones sobre falsos positivos",
+          "Mantiene bloqueado el envío por defecto si falla el proceso de privacidad",
+          "La directiva empresarial admite categorías, umbrales, reglas regex y selección del motor",
+          "El registro empresarial opcional contiene metadatos, nunca el prompt ni los valores detectados"
+        ]
+      },
+      "supported_platforms": "Chrome 124 or newer, Microsoft Edge (Chromium-based), Manifest V3",
+      "supported_services": "ChatGPT, Claude, Gemini, Perplexity, Mistral, Grok, Grok on X, DeepSeek, OpenEvidence",
+      "privacy": {
+        "en": [
+          "No detection backend exists; model weights and runtime ship with the extension.",
+          "No telemetry, analytics or error reporting is sent.",
+          "Placeholder mappings remain in tab memory and are discarded when the tab closes.",
+          "Detection works offline after installation."
+        ],
+        "es": [
+          "No existe un servidor de detección; los pesos del modelo y el entorno de ejecución se incluyen en la extensión.",
+          "No se envían telemetría, analítica ni informes de errores.",
+          "Los mapas de marcadores permanecen en la memoria de la pestaña y se descartan al cerrarla.",
+          "La detección funciona sin conexión después de instalar la extensión."
+        ]
+      },
+      "limitations": {
+        "en": [
+          "TrustPrompt does not make the selected public AI model local or on-premises.",
+          "Sanitised text can leave the device when the user sends it.",
+          "The extension acts only on its supported AI websites.",
+          "Machines without a qualifying GPU use a slower local WASM path."
+        ],
+        "es": [
+          "TrustPrompt no convierte el modelo público elegido en un sistema local u on-premise.",
+          "El texto saneado puede salir del dispositivo cuando el usuario lo envía.",
+          "La extensión solo actúa en los sitios web de IA compatibles.",
+          "Los equipos sin una GPU compatible usan una vía WASM local más lenta."
+        ]
+      },
+      "tier_names": "Free, Small team, Business, Growth, Enterprise",
+      "technical_requirements": "Chrome 124 or newer; WebGPU shader-f16 and at least 512,004,096-byte buffer limits for the fast path; local WASM q8 fallback; approximately 1 GB of storage for the active model"
+    },
+    "trustcore": {
+      "name": "TrustCore",
+      "website": "https://solutions.futurion.es/products/trustcore/",
+      "category": "Private document intelligence (browser extension with optional local companion)",
+      "tagline": {
+        "en": "Private document Q&A with verifiable answers on customer-controlled hardware",
+        "es": "Preguntas y respuestas privadas con respuestas verificables en hardware controlado por el cliente"
+      },
+      "description_80": {
+        "en": "Private document intelligence with citations and local processing.",
+        "es": "Inteligencia documental privada con citas y tratamiento local."
+      },
+      "description_160": {
+        "en": "TrustCore answers questions from customer documents with source passages and pages. It runs locally by default and can use customer-controlled endpoints.",
+        "es": "TrustCore responde sobre documentos del cliente con pasajes y páginas de origen. Funciona en local por defecto y admite puntos controlados por el cliente."
+      },
+      "description_300": {
+        "en": "TrustCore indexes customer documents, retrieves relevant passages and produces answers tied to their sources. Documents, embeddings and the entity graph remain local on the default path. Customers can optionally connect embedding, OCR or chat compute through endpoints they select and control.",
+        "es": "TrustCore indexa documentos del cliente, recupera pasajes relevantes y genera respuestas vinculadas a sus fuentes. En la vía predeterminada, los documentos, vectores y el grafo permanecen en local. El cliente puede conectar computación de vectores, OCR o chat mediante puntos que elija y controle."
+      },
+      "description_500": {
+        "en": "TrustCore is a browser extension with an optional local companion for evidence-led document work. It combines vector and full-text retrieval with an entity graph, conflict detection and citation checks, tying answers to source passages and pages. Documents and indexes stay on the customer’s machine on the local path; no Futurion Solutions backend holds them. For heavier workloads, customers may use embedding, OCR or chat endpoints that they select and control.",
+        "es": "TrustCore es una extensión de navegador con un servicio local opcional para trabajar con documentos y evidencias. Combina recuperación vectorial y de texto completo con un grafo de entidades, detección de conflictos y comprobación de citas, y vincula las respuestas con pasajes y páginas. En la vía local, los documentos e índices permanecen en el equipo del cliente y ningún servidor de Futurion Solutions los aloja. El cliente puede usar puntos de computación propios para cargas mayores."
+      },
+      "deployment_boundary": {
+        "en": "Local by default, with optional embedding, OCR or chat endpoints selected and controlled by the customer.",
+        "es": "Local por defecto, con puntos opcionales de vectores, OCR o chat elegidos y controlados por el cliente."
+      },
+      "capabilities": {
+        "en": [
+          "Indexes documents into local projects",
+          "Combines vector and full-text retrieval",
+          "Expands retrieval through relationships in an entity graph",
+          "Ties answers to exact source passages and pages",
+          "Identifies conflicting values or clauses across documents",
+          "Checks whether claims are supported by retrieved evidence",
+          "Team tier and above can reason about effective and superseded clauses",
+          "Team tier and above can apply a fixed system prompt to each project",
+          "Provides a visual knowledge map for inspecting entities and links",
+          "The optional local companion supports scanned-document OCR"
+        ],
+        "es": [
+          "Indexa documentos en proyectos locales",
+          "Combina recuperación vectorial y de texto completo",
+          "Amplía la recuperación mediante relaciones en un grafo de entidades",
+          "Vincula las respuestas con pasajes y páginas exactos de la fuente",
+          "Detecta valores o cláusulas contradictorios entre documentos",
+          "Comprueba si las afirmaciones están respaldadas por las evidencias recuperadas",
+          "El nivel Team y superiores pueden razonar sobre cláusulas vigentes y sustituidas",
+          "El nivel Team y superiores pueden aplicar instrucciones fijas a cada proyecto",
+          "Ofrece un mapa visual del conocimiento para revisar entidades y vínculos",
+          "El servicio local opcional admite OCR para documentos escaneados"
+        ]
+      },
+      "supported_documents": "Text-based PDF, scanned PDF with OCR, TXT, Markdown",
+      "privacy": {
+        "en": [
+          "No Futurion Solutions backend hosts customer documents.",
+          "Documents, embeddings and the entity graph stay in a local database on the default path.",
+          "Optional external compute is selected and controlled by the customer.",
+          "The local path does not require a third-party AI account."
+        ],
+        "es": [
+          "Ningún servidor de Futurion Solutions aloja los documentos del cliente.",
+          "Los documentos, vectores y el grafo de entidades permanecen en una base de datos local en la vía predeterminada.",
+          "La computación externa opcional la elige y controla el cliente.",
+          "La vía local no requiere una cuenta de IA de terceros."
+        ]
+      },
+      "limitations": {
+        "en": [
+          "Answers support review and do not replace authoritative legal or professional judgement.",
+          "Data sent to an optional endpoint follows the boundary and terms of the endpoint selected by the customer.",
+          "TrustCore is designed to show sources rather than present unsupported answers."
+        ],
+        "es": [
+          "Las respuestas ayudan a la revisión y no sustituyen el criterio jurídico o profesional autorizado.",
+          "Los datos enviados a un punto opcional se rigen por el límite y las condiciones del punto elegido por el cliente.",
+          "TrustCore está diseñado para mostrar las fuentes, no para presentar respuestas sin respaldo."
+        ]
+      },
+      "tier_names": "Free, Starter, Team, Business, Enterprise",
+      "technical_requirements": "Chrome, Edge or Brave 124 or newer; Windows, macOS or Linux; 8 GB RAM minimum, 16 GB recommended for larger projects; optional WebGPU-capable GPU (local CPU fallback is slower); local storage sized for the document collection, indexes and bundled model; optional Docker companion for block-level OCR, re-ranking and local model workloads; OpenAI-compatible endpoints for optional customer-controlled compute"
+    },
+    "trustauto": {
+      "name": "TrustAuto",
+      "website": "https://solutions.futurion.es/products/trustauto/",
+      "category": "Governed business-process automation",
+      "tagline": {
+        "en": "Governed automation around the systems you already use",
+        "es": "Automatización gobernada en torno a los sistemas que ya utiliza"
+      },
+      "description_80": {
+        "en": "Governed process automation around existing systems and records.",
+        "es": "Automatización gobernada en torno a los sistemas y registros existentes."
+      },
+      "description_160": {
+        "en": "TrustAuto orchestrates intake, reminders, approvals and follow-ups through self-hosted n8n, Power Automate or hybrid architectures.",
+        "es": "TrustAuto orquesta altas, recordatorios, aprobaciones y seguimientos mediante n8n autoalojado, Power Automate o arquitecturas híbridas."
+      },
+      "description_300": {
+        "en": "TrustAuto automates tasks, intake, timers, approvals, escalations and movement between systems without becoming the authoritative record. It supports locally self-hosted n8n, Microsoft Power Automate and hybrid designs, with scoped access, logs, exception handling and human checkpoints.",
+        "es": "TrustAuto automatiza tareas, altas, plazos, aprobaciones, escalados y movimientos entre sistemas sin convertirse en el registro maestro. Admite n8n autoalojado, Microsoft Power Automate y diseños híbridos, con acceso acotado, registros, gestión de excepciones y controles humanos."
+      },
+      "description_500": {
+        "en": "TrustAuto is governed business-process automation built around the systems an organisation already uses. It orchestrates tasks, reminders, intake, approvals, timers, escalations, invoicing steps and follow-ups without becoming the authoritative store for business or clinical records. It can use locally self-hosted n8n, Microsoft Power Automate or a hybrid design. Access is scoped, actions are logged, exceptions reach people and judgement remains with accountable staff.",
+        "es": "TrustAuto es automatización gobernada de procesos construida en torno a los sistemas que la organización ya utiliza. Orquesta tareas, recordatorios, altas, aprobaciones, plazos, escalados, pasos de facturación y seguimientos sin convertirse en el registro maestro de negocio o clínico. Puede usar n8n autoalojado, Microsoft Power Automate o un diseño híbrido. El acceso se acota, las acciones se registran y las excepciones llegan a personas responsables."
+      },
+      "deployment_boundary": {
+        "en": "Selected process by process: self-hosted n8n, Microsoft Power Automate or a governed hybrid design.",
+        "es": "Se elige proceso por proceso: n8n autoalojado, Microsoft Power Automate o un diseño híbrido gobernado."
+      },
+      "capabilities": {
+        "en": [
+          "Structured intake and routing",
+          "Timers, reminders and follow-ups",
+          "Explicit approval checkpoints",
+          "Escalation and exception paths",
+          "Movement between existing systems through bounded connectors",
+          "Attributable action logs",
+          "Governed preparation of invoicing steps"
+        ],
+        "es": [
+          "Altas estructuradas y encaminamiento",
+          "Plazos, recordatorios y seguimientos",
+          "Puntos de aprobación explícitos",
+          "Vías de escalado y gestión de excepciones",
+          "Movimiento entre sistemas existentes mediante conectores acotados",
+          "Registros de acciones atribuibles",
+          "Preparación gobernada de pasos de facturación"
+        ]
+      },
+      "platforms": "n8n (self-hosted), Microsoft Power Automate, Microsoft 365, hybrid architecture",
+      "scenarios": {
+        "en": [
+          "Legal intake, routing, reminders and approvals",
+          "Healthcare intake, appointment reminders, billing preparation and referral routing",
+          "Compliance tasks, evidence requests and attributable follow-up",
+          "Finance approvals and exception escalation"
+        ],
+        "es": [
+          "Altas jurídicas, encaminamiento, recordatorios y aprobaciones",
+          "Altas sanitarias, recordatorios de citas, preparación de facturación y encaminamiento de derivaciones",
+          "Tareas de cumplimiento, solicitudes de evidencias y seguimiento atribuible",
+          "Aprobaciones financieras y escalado de excepciones"
+        ]
+      },
+      "limitations": {
+        "en": [
+          "TrustAuto does not replace the CRM, ERP, clinical or document system as the authoritative record.",
+          "Not every workflow step is necessarily local; each boundary must be defined.",
+          "Decisions requiring judgement remain with accountable people."
+        ],
+        "es": [
+          "TrustAuto no sustituye al CRM, ERP, sistema clínico o documental como registro maestro.",
+          "No todos los pasos del flujo son necesariamente locales; debe definirse cada límite.",
+          "Las decisiones que exigen criterio permanecen en manos de personas responsables."
+        ]
+      }
+    },
+    "medcore": {
+      "name": "MedCore Private AI",
+      "website": "https://solutions.futurion.es/medcore-private-ai/",
+      "category": "On-premises healthcare AI infrastructure",
+      "tagline": {
+        "en": "Fully on-premises healthcare AI infrastructure",
+        "es": "Infraestructura de IA sanitaria totalmente on-premise"
+      },
+      "description_80": {
+        "en": "Fully on-premises AI infrastructure for healthcare organisations.",
+        "es": "Infraestructura de IA totalmente on-premise para organizaciones sanitarias."
+      },
+      "description_160": {
+        "en": "MedCore deploys healthcare AI models, retrieval, integrations and controls inside the customer environment. Professionals validate all clinical outputs.",
+        "es": "MedCore despliega modelos, recuperación, integraciones y controles de IA sanitaria en el entorno del cliente. Profesionales validan los resultados clínicos."
+      },
+      "description_300": {
+        "en": "MedCore Private AI is fully on-premises healthcare AI. Patient data, models and supporting services remain inside the customer environment. It combines compute, retrieval from verified institutional knowledge, integrations, access controls, auditability and deployment documentation.",
+        "es": "MedCore Private AI es IA sanitaria totalmente on-premise. Los datos de pacientes, los modelos y los servicios permanecen en el entorno del cliente. Combina computación, recuperación desde conocimiento institucional verificado, integraciones, controles de acceso, auditabilidad y documentación."
+      },
+      "description_500": {
+        "en": "MedCore Private AI is fully on-premises healthcare AI for organisations that require patient data, models and services to remain in their own environment. It brings together compute, healthcare-focused models, retrieval from verified institutional knowledge, integrations, access controls, auditability and deployment documentation. It can assist documentation, knowledge retrieval, multilingual communication and governed administration; qualified professionals validate clinical outputs.",
+        "es": "MedCore Private AI es IA sanitaria on-premise para organizaciones que necesitan mantener en su entorno los datos de pacientes, modelos y servicios. Reúne computación, modelos orientados a sanidad, recuperación desde conocimiento institucional verificado, integraciones, controles de acceso, auditabilidad y documentación. Puede ayudar con documentación, consulta de conocimiento, comunicación multilingüe y administración gobernada; profesionales cualificados validan los resultados clínicos."
+      },
+      "deployment_boundary": {
+        "en": "Fully on-premises inside the healthcare organisation’s environment, including isolated environments where required.",
+        "es": "Totalmente on-premise en el entorno de la organización sanitaria, incluidos entornos aislados cuando sea necesario."
+      },
+      "capabilities": {
+        "en": [
+          "Healthcare-focused language-model capability",
+          "Retrieval from verified institutional knowledge",
+          "Assistive clinical documentation",
+          "Assistive multilingual communication",
+          "Role-appropriate access controls",
+          "Auditable actions and deployment documentation",
+          "Integration with existing healthcare environments"
+        ],
+        "es": [
+          "Capacidad de modelos de lenguaje orientados a sanidad",
+          "Recuperación desde conocimiento institucional verificado",
+          "Documentación clínica asistencial",
+          "Comunicación multilingüe asistencial",
+          "Controles de acceso adecuados a cada función",
+          "Acciones auditables y documentación del despliegue",
+          "Integración con entornos sanitarios existentes"
+        ]
+      },
+      "limitations": {
+        "en": [
+          "Outputs are assistive and require validation by qualified healthcare professionals.",
+          "MedCore does not make autonomous clinical decisions.",
+          "The architecture can support governance duties but does not guarantee compliance."
+        ],
+        "es": [
+          "Los resultados son asistenciales y deben validarlos profesionales sanitarios cualificados.",
+          "MedCore no toma decisiones clínicas autónomas.",
+          "La arquitectura puede respaldar obligaciones de gobernanza, pero no garantiza el cumplimiento."
+        ]
+      }
+    }
+  },
+  "services": {
+    "automation_roadmap": {
+      "name": "Automation Roadmap",
+      "tagline": {
+        "en": "The assessment that decides what to automate, what not to automate and on which architecture",
+        "es": "La evaluación que decide qué automatizar, qué no automatizar y con qué arquitectura"
+      },
+      "description_80": {
+        "en": "A process, data and risk assessment before automation begins.",
+        "es": "Una evaluación de procesos, datos y riesgos antes de automatizar."
+      },
+      "description_160": {
+        "en": "The Automation Roadmap maps processes, systems, data flows, risks and responsibilities, then recommends an appropriate deployment architecture.",
+        "es": "Automation Roadmap mapea procesos, sistemas, flujos de datos, riesgos y responsabilidades, y recomienda una arquitectura de despliegue adecuada."
+      },
+      "description_300": {
+        "en": "The Automation Roadmap establishes what should be automated, what should remain human-led and which architecture is appropriate. It maps the current process, systems, data flows, access points, pain, exceptions and responsibilities before prioritising feasible opportunities and controls.",
+        "es": "Automation Roadmap determina qué debe automatizarse, qué debe seguir en manos de personas y qué arquitectura conviene. Mapea el proceso actual, sistemas, flujos de datos, accesos, problemas, excepciones y responsabilidades antes de priorizar oportunidades viables y controles."
+      },
+      "deliverables": {
+        "en": [
+          "Current-process map grounded in actual operating practice",
+          "Inventory of systems, authoritative records and integration points",
+          "Map of data sources, access, storage and permitted destinations",
+          "Risk, sensitivity, exception and responsibility map",
+          "Prioritised feasible opportunities and quick operational improvements",
+          "Identification of work that should remain human-led",
+          "Recommended local, on-premises, customer-cloud, hybrid or hosted architecture",
+          "Required access, approval, audit and exception controls",
+          "Practical sequence for implementation and validation"
+        ],
+        "es": [
+          "Mapa del proceso actual basado en la operativa real",
+          "Inventario de sistemas, registros maestros y puntos de integración",
+          "Mapa de fuentes de datos, acceso, almacenamiento y destinos permitidos",
+          "Mapa de riesgos, sensibilidad, excepciones y responsabilidades",
+          "Oportunidades viables y mejoras operativas inmediatas priorizadas",
+          "Identificación del trabajo que debe seguir en manos de personas",
+          "Arquitectura local, on-premise, en la nube del cliente, híbrida o alojada recomendada",
+          "Controles necesarios de acceso, aprobación, auditoría y excepciones",
+          "Secuencia práctica de implantación y validación"
+        ]
+      },
+      "outcomes": {
+        "en": [
+          "Avoid digitising a broken process.",
+          "Avoid granting an integration more access than it needs.",
+          "Understand the data boundary before selecting infrastructure."
+        ],
+        "es": [
+          "Evitar digitalizar un proceso defectuoso.",
+          "Evitar conceder a una integración más acceso del necesario.",
+          "Comprender el límite de los datos antes de elegir la infraestructura."
+        ]
+      }
+    },
+    "smseagle": {
+      "name": "SMSEagle supply and integration",
+      "credential": "Official SMSEagle Technology Partner — Spain",
+      "vendor": "SMSEagle",
+      "relationship": "Technology Partner",
+      "tagline": {
+        "en": "On-premise hardware SMS gateways: supply, installation, integration and managed alerting",
+        "es": "Pasarelas SMS por hardware on-premise: suministro, instalación, integración y alertas gestionadas"
+      },
+      "description_80": {
+        "en": "SMSEagle hardware supply, installation and workflow integration.",
+        "es": "Suministro, instalación e integración de hardware SMSEagle."
+      },
+      "description_160": {
+        "en": "Futurion Solutions supplies and integrates SMSEagle on-premise messaging hardware for alerts and workflows, with optional ongoing management.",
+        "es": "Futurion Solutions suministra e integra hardware de mensajería SMSEagle on-premise para alertas y flujos, con gestión continua opcional."
+      },
+      "description_300": {
+        "en": "SMSEagle is third-party messaging hardware built by SMSEagle. As an official Technology Partner, Futurion Solutions can size and supply a device, install and configure it, connect it to monitoring and workflow systems, design escalation paths, validate delivery and provide optional management.",
+        "es": "SMSEagle es hardware de mensajería de terceros fabricado por SMSEagle. Como Technology Partner oficial, Futurion Solutions puede dimensionar y suministrar el equipo, instalarlo, conectarlo a sistemas de monitorización y flujos, diseñar escalados, validar la entrega y ofrecer gestión opcional."
+      },
+      "boundary": {
+        "en": "Plain SMS and voice travel from the device through its SIM and the mobile carrier; WhatsApp and Signal use their respective external networks.",
+        "es": "Los SMS y la voz salen del equipo mediante su SIM y la red del operador; WhatsApp y Signal utilizan sus respectivas redes externas."
+      },
+      "services": {
+        "en": [
+          "Device sizing and supply",
+          "Installation, network configuration, SIM setup and hardening",
+          "Integration with monitoring, workflow and business systems",
+          "Escalation groups, shifts, channel order and fallback design",
+          "Delivery tests and acceptance evidence",
+          "Optional updates, rule maintenance, operational tests and SIM management"
+        ],
+        "es": [
+          "Dimensionamiento y suministro del equipo",
+          "Instalación, configuración de red, preparación de la SIM y securización",
+          "Integración con sistemas de monitorización, flujos y aplicaciones de negocio",
+          "Diseño de grupos de escalado, turnos, orden de canales y vías alternativas",
+          "Pruebas de entrega y evidencias de aceptación",
+          "Actualizaciones, mantenimiento de reglas, pruebas operativas y gestión de SIM opcionales"
+        ]
+      },
+      "channels": "SMS, MMS, voice calls and text-to-speech, WhatsApp with SMS fallback, Signal with SMS fallback, email-to-SMS and SMS-to-email",
+      "integrations": "REST API, SMPP, webhooks and callbacks, MQTT, email-to-SMS, n8n, Microsoft Power Automate, Zabbix, PRTG, Nagios, Icinga, Checkmk, SNMP, Modbus TCP",
+      "capabilities": {
+        "en": [
+          "On-device ICMP, TCP, UDP, SNMP and Modbus TCP monitoring probes",
+          "Cross-channel workflow rules with conditions and regular expressions",
+          "Escalation groups and shift management for on-call teams",
+          "Master and backup failover using two devices",
+          "Temperature and humidity sensor alerts on supported hardware",
+          "LDAP authentication and multifactor authentication"
+        ],
+        "es": [
+          "Sondas integradas de monitorización ICMP, TCP, UDP, SNMP y Modbus TCP",
+          "Reglas de flujo entre canales con condiciones y expresiones regulares",
+          "Grupos de escalado y gestión de turnos para equipos de guardia",
+          "Conmutación entre equipo maestro y de respaldo mediante dos dispositivos",
+          "Alertas de sensores de temperatura y humedad en hardware compatible",
+          "Autenticación LDAP y autenticación multifactor"
+        ]
+      },
+      "limitations": {
+        "en": [
+          "SMSEagle is built by SMSEagle; it is not Futurion Solutions proprietary technology.",
+          "Delivery still depends on the mobile network and the selected channel.",
+          "A gateway is not a guarantee during any power outage; the device and mobile network both require power resilience.",
+          "WhatsApp and Signal inherently traverse their external networks.",
+          "The alerting path can support regulatory duties but does not by itself make an organisation compliant.",
+          "No Futurion Solutions Pandora FMS plugin is represented as available."
+        ],
+        "es": [
+          "SMSEagle lo fabrica SMSEagle; no es tecnología propia de Futurion Solutions.",
+          "La entrega sigue dependiendo de la red móvil y del canal elegido.",
+          "La pasarela no ofrece garantías ante cualquier apagón; tanto el equipo como la red móvil necesitan resiliencia energética.",
+          "WhatsApp y Signal utilizan necesariamente sus redes externas.",
+          "La vía de alertas puede respaldar obligaciones normativas, pero por sí sola no hace que una organización cumpla la normativa.",
+          "No se presenta como disponible ningún complemento de Futurion Solutions para Pandora FMS."
+        ]
+      }
+    }
+  },
+  "use_cases": {
+    "en": [
+      "Remove identifying values before legal staff send a prompt to a supported public AI interface.",
+      "Query contracts and case files with source passages, page references and conflict detection.",
+      "Govern intake, reminders, routing, approvals and follow-up while case systems remain authoritative.",
+      "Reduce unnecessary disclosure when staff use supported public AI interfaces.",
+      "Query policies, research and protocols on local or customer-controlled infrastructure.",
+      "Automate intake, reminders, approvals, billing preparation and referral routing with human checkpoints.",
+      "Deploy assistive healthcare AI fully inside the organisation’s environment.",
+      "Find relationships and inconsistencies across evidence with traceable answers.",
+      "Orchestrate controlled approvals, reminders and exception escalation around finance systems.",
+      "Send out-of-band alerts when primary internet, DNS, VPN or cloud connectivity fails while the mobile network remains available."
+    ],
+    "es": [
+      "Ocultar valores identificativos antes de que el personal jurídico envíe un prompt a una interfaz pública de IA compatible.",
+      "Consultar contratos y expedientes con pasajes de origen, referencias de página y detección de conflictos.",
+      "Gobernar altas, recordatorios, encaminamiento, aprobaciones y seguimiento, manteniendo los sistemas de expedientes como fuente maestra.",
+      "Reducir la divulgación innecesaria cuando el personal usa interfaces públicas de IA compatibles.",
+      "Consultar políticas, investigación y protocolos en infraestructura local o controlada por el cliente.",
+      "Automatizar altas, recordatorios, aprobaciones, preparación de facturación y derivaciones con controles humanos.",
+      "Desplegar IA sanitaria asistencial íntegramente en el entorno de la organización.",
+      "Encontrar relaciones e incoherencias entre evidencias mediante respuestas trazables.",
+      "Orquestar aprobaciones controladas, recordatorios y escalado de excepciones en torno a sistemas financieros.",
+      "Enviar alertas fuera de banda cuando fallan internet, DNS, VPN o la nube y la red móvil sigue disponible."
+    ]
+  },
+  "differentiators": {
+    "en": [
+      "Private and local architecture with product-specific boundaries",
+      "Precise explanations of where original data is processed and what may leave",
+      "Process and risk mapping before tool selection",
+      "Scoped access, attributable actions, approval points and exception paths",
+      "Explicit human responsibility wherever judgement is required",
+      "Established platforms, standard interfaces and existing sources of truth",
+      "Customer-selected infrastructure and fewer unnecessary proprietary dependencies",
+      "Experience translating privacy and regulated-environment needs into operational controls"
+    ],
+    "es": [
+      "Arquitectura privada y local con límites específicos para cada producto",
+      "Explicaciones precisas sobre dónde se tratan los datos originales y qué puede salir",
+      "Mapa de procesos y riesgos antes de elegir herramientas",
+      "Acceso acotado, acciones atribuibles, aprobaciones y vías de excepción",
+      "Responsabilidad humana explícita cuando se necesita criterio",
+      "Plataformas consolidadas, interfaces estándar y fuentes maestras existentes",
+      "Infraestructura elegida por el cliente y menos dependencias propietarias innecesarias",
+      "Experiencia para traducir necesidades de privacidad y entornos regulados en controles operativos"
+    ]
+  },
+  "claim_guardrails": {
+    "en": [
+      "Use Futurion Solutions or Futurion Solutions S.L.; do not shorten the company name.",
+      "Do not claim that every product or deployment is fully on-premises.",
+      "State that detection and redaction are local and that the sanitised prompt may go to a public LLM.",
+      "State that TrustCore is local by default and may use customer-controlled endpoints.",
+      "Describe self-hosted n8n, Microsoft Power Automate and hybrid deployments accurately.",
+      "Reserve fully on-premises claims for MedCore and deployments explicitly designed that way.",
+      "Use support, mapping or documentation language; never guarantee compliance, security or outcomes.",
+      "MedCore outputs are assistive and require qualified professional validation.",
+      "Attribute the hardware to SMSEagle and Futurion Solutions’ role to supply and integration.",
+      "Do not invent customers, results, certifications or corporate facts."
+    ],
+    "es": [
+      "Use Futurion Solutions o Futurion Solutions S.L.; no abrevie el nombre de la empresa.",
+      "No afirme que todos los productos o despliegues sean totalmente on-premise.",
+      "Indique que la detección y la ocultación son locales y que el prompt saneado puede llegar a una IA pública.",
+      "Indique que TrustCore es local por defecto y puede usar puntos controlados por el cliente.",
+      "Describa con precisión los despliegues con n8n autoalojado, Microsoft Power Automate e híbridos.",
+      "Reserve las afirmaciones de totalmente on-premise para MedCore y despliegues diseñados expresamente así.",
+      "Use fórmulas de apoyo, correspondencia o documentación; nunca garantice cumplimiento, seguridad o resultados.",
+      "Los resultados de MedCore son asistenciales y requieren validación profesional cualificada.",
+      "Atribuya el hardware a SMSEagle y a Futurion Solutions las labores de suministro e integración.",
+      "No invente clientes, resultados, certificaciones ni datos corporativos."
+    ]
+  },
+  "social": {
+    "linkedin": "https://www.linkedin.com/company/111621147/",
+    "facebook": "https://www.facebook.com/solutions.futurion.es/",
+    "instagram": "https://www.instagram.com/solutions.futurion.es/"
+  },
+  "keywords": {
+    "en": "private AI, local AI, on-premises AI, governed automation, GDPR support, PII redaction, document intelligence, Graph RAG, business-process automation, healthcare AI, hardware SMS gateway, critical alerting, Valencia, Spain, European Union",
+    "es": "IA privada, IA local, IA on-premise, automatización gobernada, apoyo al RGPD, ocultación de datos personales, inteligencia documental, Graph RAG, automatización de procesos, IA sanitaria, pasarela SMS por hardware, alertas críticas, Valencia, España, Unión Europea"
+  }
+}

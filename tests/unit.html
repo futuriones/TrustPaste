@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustPaste — Phase 8 unit tests</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 60rem; padding: 0 1rem; }
+    h1 { font-size: 1.4rem; }
+    #summary { font-weight: 700; }
+    ol { padding-left: 1.75rem; }
+    li { margin: 0.35rem 0; white-space: pre-wrap; }
+    .pass { color: #16833b; }
+    .fail { color: #c52b2b; }
+  </style>
+</head>
+<body>
+  <h1>TrustPaste — Phase 8 unit tests</h1>
+  <p id="summary" aria-live="polite">Running…</p>
+  <ol id="results"></ol>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/normalization.js"></script>
+  <script src="../shared/synonyms.js"></script>
+  <script src="../shared/flatten-json.js"></script>
+  <script src="../shared/search.js"></script>
+  <script src="../shared/ranking.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="../content/notifications.js"></script>
+  <script src="../content/field-context.js"></script>
+  <script src="../content/insertion.js"></script>
+  <script src="../content/picker.js"></script>
+  <!--
+    Regression guard: every module is loaded a second time to simulate the
+    service worker re-running chrome.scripting.executeScript in a tab where the
+    scripts are already present. Each file must be re-evaluation-safe (guarded
+    IIFE, no top-level const/let bindings) or this page throws a SyntaxError
+    and the suite visibly fails.
+  -->
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/normalization.js"></script>
+  <script src="../shared/synonyms.js"></script>
+  <script src="../shared/flatten-json.js"></script>
+  <script src="../shared/search.js"></script>
+  <script src="../shared/ranking.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="../content/notifications.js"></script>
+  <script src="../content/field-context.js"></script>
+  <script src="../content/insertion.js"></script>
+  <script src="../content/picker.js"></script>
+  <script src="unit.js"></script>
+</body>
+</html>

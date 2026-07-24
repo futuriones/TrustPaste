@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="description"
+    content="Manage locally stored profile data and preferences for TrustPaste."
+  >
+  <title>TrustPaste — Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div class="brand-mark">
+        <img src="../icons/TrustPaste_logo_96.png" alt="TrustPaste" width="64" height="59">
+      </div>
+      <div>
+        <p class="eyebrow">TrustPaste</p>
+        <h1>Options</h1>
+        <p class="page-intro">
+          Keep business profile data on this device and choose how values are inserted.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    <noscript>
+      <p class="notice notice--error">JavaScript is required to manage extension options.</p>
+    </noscript>
+
+    <div id="repair-notice" class="notice notice--warning" role="status" hidden></div>
+    <div id="initialization-error" class="notice notice--error" role="alert" hidden></div>
+
+    <section class="panel panel--profile" aria-labelledby="profile-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-number" aria-hidden="true">01</p>
+          <h2 id="profile-heading">Profile data</h2>
+          <p>Import a JSON object or array. The file never leaves this browser.</p>
+        </div>
+        <span id="profile-state-badge" class="badge">No profile</span>
+      </div>
+
+      <div class="import-card">
+        <label class="file-picker" for="profile-file">
+          <span class="file-picker__title">Choose a JSON profile</span>
+          <span id="selected-file-name" class="file-picker__detail">No file selected</span>
+          <input id="profile-file" type="file" accept=".json,application/json">
+        </label>
+        <button id="import-profile" class="button button--primary" type="button">
+          Import profile
+        </button>
+      </div>
+
+      <div id="profile-status" class="inline-message" role="status" aria-live="polite" hidden></div>
+      <div id="profile-error" class="inline-message inline-message--error" role="alert" hidden></div>
+
+      <dl class="metrics" aria-label="Imported profile details">
+        <div>
+          <dt>Source file</dt>
+          <dd id="profile-file-name">—</dd>
+        </div>
+        <div>
+          <dt>Imported</dt>
+          <dd id="profile-imported-at">—</dd>
+        </div>
+        <div>
+          <dt>Entries</dt>
+          <dd id="profile-entry-count">0</dd>
+        </div>
+      </dl>
+
+      <div class="button-row" aria-label="Profile actions">
+        <button id="export-profile" class="button button--secondary" type="button" disabled>
+          Export JSON
+        </button>
+        <button id="clear-profile" class="button button--secondary" type="button" disabled>
+          Clear profile
+        </button>
+        <button id="reset-extension" class="button button--danger" type="button">
+          Reset extension
+        </button>
+      </div>
+
+      <div class="preview">
+        <div class="preview__heading">
+          <div>
+            <h3>JSON preview</h3>
+            <p>Expand branches to inspect the stored structure.</p>
+          </div>
+        </div>
+        <div id="profile-preview" class="tree" aria-live="polite">
+          <p class="empty-state">Import a profile to preview its data.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="preferences-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-number" aria-hidden="true">02</p>
+          <h2 id="preferences-heading">Preferences</h2>
+          <p>Changes are saved automatically on this device.</p>
+        </div>
+      </div>
+
+      <div id="preferences-status" class="inline-message" role="status" aria-live="polite" hidden></div>
+      <div id="preferences-error" class="inline-message inline-message--error" role="alert" hidden></div>
+
+      <div class="form-grid">
+        <fieldset class="field-group">
+          <legend>Default insert mode</legend>
+          <label class="choice-card">
+            <input type="radio" name="insert-mode" value="replace">
+            <span>
+              <strong>Replace</strong>
+              <small>Replace the field’s current value.</small>
+            </span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="insert-mode" value="atCursor">
+            <span>
+              <strong>At cursor</strong>
+              <small>Insert at the current selection.</small>
+            </span>
+          </label>
+        </fieldset>
+
+        <div class="field-group">
+          <label for="preferred-language">Preferred language</label>
+          <select id="preferred-language">
+            <option value="auto">Automatic</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="none">No preference</option>
+          </select>
+          <p class="field-help">Helps language-specific values rank more usefully.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="active-scope">Active scope</label>
+          <select id="active-scope">
+            <option value="">All profile data</option>
+          </select>
+          <p class="field-help">Scopes are generated from the imported profile.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="max-recent-entries">Maximum recent entries</label>
+          <input id="max-recent-entries" type="number" min="5" max="50" step="1" inputmode="numeric">
+          <p class="field-help">Choose an integer from 5 to 50.</p>
+        </div>
+      </div>
+
+      <div class="toggle-list">
+        <label class="toggle-row">
+          <span>
+            <strong>Limit results to active scope</strong>
+            <small>Hide values outside the selected scope.</small>
+          </span>
+          <input id="scope-only" type="checkbox" role="switch">
+        </label>
+        <label class="toggle-row">
+          <span>
+            <strong>Show null values</strong>
+            <small>Include empty null leaves in the preview and picker.</small>
+          </span>
+          <input id="show-null-values" type="checkbox" role="switch">
+        </label>
+        <label class="toggle-row">
+          <span>
+            <strong>Confirm oversized values</strong>
+            <small>Ask before inserting text longer than a field permits.</small>
+          </span>
+          <input id="confirm-oversized-values" type="checkbox" role="switch">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="favorites-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-number" aria-hidden="true">03</p>
+          <h2 id="favorites-heading">Favorites</h2>
+          <p>Starred profile paths appear first when the picker opens.</p>
+        </div>
+        <span id="favorites-count" class="badge">0 saved</span>
+      </div>
+
+      <div id="favorites-status" class="inline-message" role="status" aria-live="polite" hidden></div>
+      <div id="favorites-error" class="inline-message inline-message--error" role="alert" hidden></div>
+      <ul id="favorites-list" class="favorites-list" aria-label="Stored favorites"></ul>
+      <p id="favorites-empty" class="empty-state">No favorites saved yet.</p>
+      <button id="clear-favorites" class="button button--secondary" type="button" disabled>
+        Clear all favorites
+      </button>
+    </section>
+
+    <section class="panel" aria-labelledby="diagnostics-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-number" aria-hidden="true">04</p>
+          <h2 id="diagnostics-heading">Diagnostics</h2>
+          <p>Review local state and maintain recent history or preferences.</p>
+        </div>
+      </div>
+
+      <div id="diagnostics-status" class="inline-message" role="status" aria-live="polite" hidden></div>
+      <div id="diagnostics-error" class="inline-message inline-message--error" role="alert" hidden></div>
+
+      <dl class="metrics metrics--diagnostics">
+        <div>
+          <dt>Extension version</dt>
+          <dd id="extension-version">—</dd>
+        </div>
+        <div>
+          <dt>Stored entries</dt>
+          <dd id="diagnostic-entry-count">0</dd>
+        </div>
+        <div>
+          <dt>Storage used</dt>
+          <dd id="storage-usage">—</dd>
+        </div>
+        <div>
+          <dt>Recent history</dt>
+          <dd id="recent-state">Empty</dd>
+        </div>
+      </dl>
+
+      <div class="button-row">
+        <button id="clear-recent" class="button button--secondary" type="button" disabled>
+          Clear recent history
+        </button>
+        <button id="reset-preferences" class="button button--secondary" type="button">
+          Reset all settings
+        </button>
+      </div>
+      <p class="field-help">
+        Reset all settings restores preference defaults; profile data, favorites, and history
+        remain stored.
+      </p>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p>Local-only by design · No network access · No analytics</p>
+    <p class="page-footer__brand">TrustPaste by Futurion Solutions</p>
+  </footer>
+
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/normalization.js"></script>
+  <script src="../shared/synonyms.js"></script>
+  <script src="../shared/flatten-json.js"></script>
+  <script src="../shared/search.js"></script>
+  <script src="../shared/ranking.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

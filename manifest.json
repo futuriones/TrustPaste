@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "TrustPaste",
+  "version": "1.0.3",
+  "description": "TrustPaste by Futurion Solutions: insert locally stored business data into form fields. No cloud, no sync, no telemetry.",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "options_page": "options/options.html",
+  "action": {
+    "default_title": "TrustPaste",
+    "default_icon": {
+      "16": "icons/TrustPaste_logo_32.png",
+      "32": "icons/TrustPaste_logo_32.png",
+      "48": "icons/TrustPaste_logo_96.png",
+      "128": "icons/TrustPaste_logo_512.png"
+    }
+  },
+  "icons": {
+    "16": "icons/TrustPaste_logo_32.png",
+    "32": "icons/TrustPaste_logo_32.png",
+    "48": "icons/TrustPaste_logo_96.png",
+    "128": "icons/TrustPaste_logo_512.png"
+  },
+  "commands": {
+    "open-picker": {
+      "suggested_key": {
+        "default": "Alt+J",
+        "mac": "Option+J"
+      },
+      "description": "Open the TrustPaste picker"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/picker.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

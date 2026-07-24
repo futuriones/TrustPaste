@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustPaste — Manual acceptance surface</title>
+  <style>
+    :root { color-scheme: light dark; font: 16px/1.5 system-ui, sans-serif; }
+    body { margin: 0 auto; max-width: 72rem; padding: 2rem 1rem 4rem; }
+    h1, h2 { line-height: 1.2; }
+    .intro { max-width: 68ch; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+    .card { border: 1px solid #7a7a7a; border-radius: 0.65rem; padding: 1rem; }
+    .field { display: grid; gap: 0.35rem; margin: 0 0 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    input, textarea, [contenteditable], button { font: inherit; }
+    input, textarea, [contenteditable] { border: 1px solid #777; border-radius: 0.35rem; padding: 0.55rem; }
+    [contenteditable] { min-height: 4rem; }
+    input:focus-visible, textarea:focus-visible, [contenteditable]:focus-visible {
+      outline: 3px solid #4c9ffe; outline-offset: 2px;
+    }
+    .counter, .indicator, .help { font-size: 0.875rem; }
+    .counter { justify-self: end; }
+    .status-grid { display: grid; gap: 0.25rem; margin: 0; }
+    .status-grid dt { font-weight: 700; }
+    .status-grid dd { margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+    #event-log { border: 1px solid #777; min-height: 8rem; padding: 0.75rem 0.75rem 0.75rem 2rem; }
+    iframe { border: 1px solid #777; height: 8rem; width: 100%; }
+    .negative-test { border: 2px dashed #b45309; border-radius: 0.65rem; margin-top: 2rem; padding: 1rem; }
+    .negative-test h2 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TrustPaste manual acceptance surface</h1>
+    <p class="intro">
+      Load the extension unpacked, import the sample profile, focus any control, and invoke the
+      picker from the toolbar, Alt+J, or the editable-field context menu. This page makes insertion
+      events and controlled-field behavior visible; it does not contain a form or submit control.
+    </p>
+
+    <section aria-labelledby="supported-heading">
+      <h2 id="supported-heading">Supported controls</h2>
+      <div class="grid">
+        <div class="card">
+          <label class="field" for="text-field">Company name — supported field
+            <input id="text-field" name="businessName" type="text" autocomplete="organization">
+          </label>
+          <label class="field" for="implicit-text-field">Input without a type
+            <input id="implicit-text-field" name="tagline">
+          </label>
+          <label class="field" for="search-field">Search input
+            <input id="search-field" name="keywords" type="search">
+          </label>
+          <label class="field" for="url-field">Website URL
+            <input id="url-field" name="website" type="url" autocomplete="url">
+          </label>
+          <label class="field" for="email-field">Business email
+            <input id="email-field" name="email" type="email" autocomplete="email">
+          </label>
+          <label class="field" for="tel-field">Telephone — supported, but requires a phone value in the imported JSON
+            <input id="tel-field" name="phone" type="tel" autocomplete="tel">
+          </label>
+          <label class="field" for="number-field">Founded year
+            <input id="number-field" name="foundedYear" type="number">
+          </label>
+        </div>
+
+        <div class="card">
+          <label class="field" for="textarea-field">Ordinary textarea
+            <textarea id="textarea-field" name="description" rows="5"></textarea>
+          </label>
+          <label class="field" for="limited-field">
+            <span>Description limited to 160 characters</span>
+            <textarea id="limited-field" name="shortDescription" rows="5" maxlength="160"></textarea>
+            <span id="limited-counter" class="counter" aria-live="polite">0 / 160</span>
+          </label>
+          <div class="field">
+            <span id="editable-label">Plain-text contenteditable description</span>
+            <div
+              id="editable-field"
+              contenteditable="true"
+              role="textbox"
+              aria-labelledby="editable-label"
+              aria-multiline="true"
+            ></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <label class="field" for="controlled-field">React-like controlled input
+            <input id="controlled-field" name="controlledBusinessName" value="Component render">
+          </label>
+          <p class="help">
+            The control has its own-property value tracker. Its event handler reads through the
+            native prototype getter, detects native-setter insertion that bypassed the component
+            setter, updates component state, and re-renders.
+          </p>
+          <dl class="status-grid" aria-live="polite">
+            <dt>Native value observed</dt><dd id="controlled-native">Component render</dd>
+            <dt>Component-state value</dt><dd id="controlled-state">Component render</dd>
+            <dt>Component setter calls</dt><dd id="controlled-setter-count">0</dd>
+            <dt>Native setter bypass detected</dt><dd id="controlled-bypass">No</dd>
+            <dt>Input event received</dt><dd id="controlled-input-event">No</dd>
+            <dt>Change event received</dt><dd id="controlled-change-event">No</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="unsupported-heading">
+      <h2 id="unsupported-heading">Unsupported and protected controls</h2>
+      <div class="grid">
+        <div class="card">
+          <label class="field"><span>Checkbox</span><input id="checkbox-field" type="checkbox"></label>
+          <label class="field"><span>Radio button</span><input id="radio-field" type="radio" name="radio-test"></label>
+          <label class="field" for="file-field">File upload<input id="file-field" type="file"></label>
+          <label class="field" for="password-field">Password<input id="password-field" type="password"></label>
+          <label class="field" for="payment-field">Payment card<input id="payment-field" type="text" autocomplete="cc-number" inputmode="numeric"></label>
+          <input id="hidden-field" type="hidden" value="must-not-change">
+        </div>
+        <div class="card">
+          <label class="field" for="date-field">Date<input id="date-field" type="date"></label>
+          <label class="field" for="color-field">Color<input id="color-field" type="color"></label>
+          <label class="field" for="range-field">Range<input id="range-field" type="range"></label>
+          <label class="field" for="disabled-field">Disabled input<input id="disabled-field" disabled value="Cannot edit"></label>
+          <label class="field" for="readonly-field">Readonly input<input id="readonly-field" readonly value="Cannot edit"></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="negative-test" aria-labelledby="iframe-heading">
+      <h2 id="iframe-heading">Intentional negative test: restricted iframe</h2>
+      <p id="iframe-help">This sandbox deliberately omits <code>allow-same-origin</code>. Its field is expected to produce an access error; it is not the supported company-name control above.</p>
+      <iframe
+        title="Sandboxed cross-origin-style field"
+        aria-describedby="iframe-help"
+        sandbox="allow-forms"
+        srcdoc="<!doctype html><html lang='en'><body><label>Restricted iframe field — expected access error <input type='text'></label></body></html>"
+      ></iframe>
+    </section>
+
+    <section aria-labelledby="events-heading">
+      <h2 id="events-heading">Field event log</h2>
+      <p>Each supported field records bubbling <code>input</code> and <code>change</code> events.</p>
+      <ol id="event-log" aria-live="polite" aria-relevant="additions text">
+        <li>No events recorded yet.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    'use strict';
+
+    const eventLog = document.getElementById('event-log');
+    let hasEvents = false;
+
+    function recordEvent(event) {
+      if (!hasEvents) {
+        eventLog.replaceChildren();
+        hasEvents = true;
+      }
+      const item = document.createElement('li');
+      item.textContent = `${event.target.id || 'unnamed field'}: ${event.type}`;
+      eventLog.prepend(item);
+    }
+
+    const supportedFields = document.querySelectorAll(
+      '#supported-heading ~ .grid input, #supported-heading ~ .grid textarea, #editable-field',
+    );
+    for (const field of supportedFields) {
+      field.addEventListener('input', recordEvent);
+      field.addEventListener('change', recordEvent);
+    }
+
+    const limitedField = document.getElementById('limited-field');
+    const limitedCounter = document.getElementById('limited-counter');
+    limitedField.addEventListener('input', () => {
+      limitedCounter.textContent = `${limitedField.value.length} / 160`;
+    });
+
+    const controlledField = document.getElementById('controlled-field');
+    const nativeValueDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value',
+    );
+    let componentState = nativeValueDescriptor.get.call(controlledField);
+    let componentSetterCalls = 0;
+
+    function updateControlledIndicators() {
+      document.getElementById('controlled-native').textContent =
+        nativeValueDescriptor.get.call(controlledField);
+      document.getElementById('controlled-state').textContent = componentState;
+      document.getElementById('controlled-setter-count').textContent = String(componentSetterCalls);
+    }
+
+    Object.defineProperty(controlledField, 'value', {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return nativeValueDescriptor.get.call(this);
+      },
+      set(nextValue) {
+        componentSetterCalls += 1;
+        componentState = String(nextValue);
+        nativeValueDescriptor.set.call(this, componentState);
+        updateControlledIndicators();
+      },
+    });
+
+    controlledField.addEventListener('input', () => {
+      const nativeValue = nativeValueDescriptor.get.call(controlledField);
+      const didBypassComponentSetter = nativeValue !== componentState;
+      document.getElementById('controlled-bypass').textContent = didBypassComponentSetter ? 'Yes' : 'No';
+      document.getElementById('controlled-input-event').textContent = 'Yes';
+      componentState = nativeValue;
+      controlledField.value = componentState;
+      updateControlledIndicators();
+    });
+    controlledField.addEventListener('change', () => {
+      document.getElementById('controlled-change-event').textContent = 'Yes';
+      updateControlledIndicators();
+    });
+    updateControlledIndicators();
+  </script>
+</body>
+</html>
