@@ -66,11 +66,11 @@ globalThis.LBA = globalThis.LBA || {};
         return {
           isSupported: false,
           inputType,
-          reason: messages.PASSWORD_OR_PAYMENT,
+          reason: messages.SECURE_OR_PAYMENT,
         };
       }
       if (inputType === 'password') {
-        return { isSupported: false, inputType, reason: messages.PASSWORD };
+        return { isSupported: false, inputType, reason: messages.SECURE };
       }
       if (isPayment) {
         return { isSupported: false, inputType, reason: messages.PAYMENT };

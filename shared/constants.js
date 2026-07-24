@@ -22,8 +22,8 @@ globalThis.LBA.constants = Object.freeze({
   ]),
 
   UNSUPPORTED_FIELD_MESSAGES: Object.freeze({
-    PASSWORD_OR_PAYMENT: 'Password and payment fields are not supported.',
-    PASSWORD: 'Password fields are not supported.',
+    SECURE_OR_PAYMENT: 'Password and payment fields are not supported.',
+    SECURE: 'Password fields are not supported.',
     PAYMENT: 'Payment fields are not supported.',
     HIDDEN: 'Hidden fields are not supported.',
     FILE: 'File inputs are not supported.',
