@@ -1,7 +1,9 @@
+# TrustPaste
+
 <p align="center">
   <img src="icons/TrustPaste_logo_96.png" alt="TrustPaste logo" width="96">
 </p>
-# TrustPaste
+
 
 **A [Futurion Solutions S.L.](https://solutions.futurion.es) product.**
 
