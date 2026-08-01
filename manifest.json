@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TrustPaste",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "TrustPaste by Futurion Solutions: insert locally stored business data into form fields. No cloud, no sync, no telemetry.",
   "permissions": [
     "storage",
