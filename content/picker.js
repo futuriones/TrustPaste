@@ -452,7 +452,36 @@ globalThis.LBA = globalThis.LBA || {};
     ).filter((element) => !element.hidden);
   }
 
+  const ALLOWED_MODIFIER_CHORDS = new Set(['a', 'c', 'v', 'x', 'z']);
+
+  function isStrayModifierChord(picker, event) {
+    return (
+      event.target === picker.search
+      && (event.ctrlKey || event.metaKey)
+      && !event.altKey
+      && event.key.length === 1
+      && !ALLOWED_MODIFIER_CHORDS.has(event.key.toLowerCase())
+    );
+  }
+
   function handleKeydown(picker, event) {
+    if (isStrayModifierChord(picker, event)) {
+      // A Ctrl/Cmd+letter chord reaching the search field as a live modifier (e.g. a
+      // stuck key, or a shortcut binding that leaves the modifier down) would
+      // otherwise trigger a browser-level shortcut instead of typing the letter.
+      // Recover what we can by inserting the character ourselves; chords the
+      // browser reserves outright (e.g. Cmd+W/T) cannot be intercepted here and
+      // must be fixed outside the extension (stuck key / shortcut rebind).
+      event.preventDefault();
+      picker.search.setRangeText(
+        event.key,
+        picker.search.selectionStart,
+        picker.search.selectionEnd,
+        'end',
+      );
+      picker.search.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       close();
@@ -656,6 +685,31 @@ globalThis.LBA = globalThis.LBA || {};
         teardown({ restoreFocus: false });
       }
     }, { capture: true, signal: controller.signal });
+
+    // Keystrokes fired inside the shadow root are retargeted to `host` once they
+    // reach the page, so host-page (or other extension) hotkey listeners that key
+    // off `event.target` never see an <input>/<textarea> and treat the keystroke as
+    // a shortcut. Once our own internal handlers (handleKeydown, native typing,
+    // etc.) have finished with the event, stop it from continuing on into the page.
+    //
+    // This listener is deliberately on `host`, in the bubble phase: a keydown fired
+    // at the search input bubbles through the shadow tree (where handleKeydown and
+    // native text insertion run normally) before it ever reaches `host`, so nothing
+    // inside the picker is affected. Only once it is about to cross the shadow
+    // boundary into the page's `document`/`window` do we stop it here.
+    //
+    // This does NOT stop a page (or another extension) that listens in the
+    // *capture* phase on an ancestor above `host` (e.g. `document` or `window`
+    // with `{ capture: true }`) — such a listener runs before the event reaches
+    // `host` at all, on the way down, so it still sees the retargeted event. That
+    // is a real but narrower gap: most hotkey handlers attach in the bubble phase.
+    for (const type of ['keydown', 'keypress', 'keyup', 'beforeinput']) {
+      host.addEventListener(type, (event) => {
+        if (activePicker === picker) {
+          event.stopPropagation();
+        }
+      }, { signal: controller.signal });
+    }
 
     return picker;
   }

@@ -786,6 +786,76 @@ test('picker: search renders ranked options and keyboard navigation wraps', asyn
   target.remove();
 });
 
+test('picker: stray Ctrl/Cmd+letter chords still type into search, real chords pass through', async () => {
+  const target = document.createElement('input');
+  document.body.append(target);
+  const entry = makeEntry('company.name', 'Futurion');
+  await LBA.picker.open({
+    targetEl: target,
+    fieldContext: { inputType: 'text' },
+    state: createPickerState([entry]),
+  });
+  const search = getPickerHost().shadowRoot.querySelector('.search');
+  search.focus();
+  for (const key of ['w', 't', 'y', 's']) {
+    search.dispatchEvent(new KeyboardEvent('keydown', {
+      key,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    }));
+  }
+  assertEqual(search.value, 'wtys', 'stray modifier chords are inserted as characters');
+
+  const event = new KeyboardEvent('keydown', {
+    key: 'a',
+    ctrlKey: true,
+    bubbles: true,
+    cancelable: true,
+  });
+  search.dispatchEvent(event);
+  assertEqual(search.value, 'wtys', 'select-all chord is left untouched, not inserted');
+  assertEqual(event.defaultPrevented, false, 'select-all chord is not intercepted');
+  LBA.picker.close();
+  target.remove();
+});
+
+test('picker: keystrokes inside the picker never reach bubble-phase page listeners', async () => {
+  const target = document.createElement('input');
+  document.body.append(target);
+  const entry = makeEntry('company.name', 'Futurion');
+  let pageSawKeydown = false;
+  // Bubble phase (the default addEventListener behavior, and how most hotkey
+  // libraries attach): this is what host.addEventListener(type, ..., { signal })
+  // in buildPicker actually protects against. A page listener on document/window
+  // with { capture: true } fires earlier, on the way down, and is a documented,
+  // out-of-scope gap (see the comment above that listener in picker.js).
+  const pageListener = () => { pageSawKeydown = true; };
+  document.addEventListener('keydown', pageListener);
+  try {
+    await LBA.picker.open({
+      targetEl: target,
+      fieldContext: { inputType: 'text' },
+      state: createPickerState([entry]),
+    });
+    const search = getPickerHost().shadowRoot.querySelector('.search');
+    search.focus();
+    const event = new KeyboardEvent('keydown', {
+      key: 'w',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    });
+    search.dispatchEvent(event);
+    assertEqual(event.defaultPrevented, false, 'plain letters are left for native typing');
+    assertEqual(pageSawKeydown, false, 'host page never observes picker keystrokes');
+    LBA.picker.close();
+  } finally {
+    document.removeEventListener('keydown', pageListener);
+  }
+  target.remove();
+});
+
 test('picker: favorites and recents skip stale paths and remain separate sections', async () => {
   await storageFake.clear();
   await LBA.storage.toggleFavorite('company.name');
