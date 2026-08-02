@@ -153,6 +153,15 @@ reported by the content script and do not set the unreachable action badge.
 
 Security boundaries include least-privilege permissions, no remote code/resources, strict extension-page CSP, untrusted JSON validation, text-only rendering, protected-field classification at selection and insertion time, no stored DOM references, and value-free operational diagnostics. See [TESTING.md](TESTING.md) for automated results, review evidence, and manual-Chrome status.
 
+## License
+
+Futurion Solutions S.L. dedicates this repository's copyright to the public
+domain under [The Unlicense](UNLICENSE). You may reuse, modify, and redistribute
+the repository without restriction.
+
+The TrustPaste and Futurion Solutions names and logos are reserved trademarks of
+Futurion Solutions S.L. No trademark permission is implied by this license.
+
 ---
 
 TrustPaste is developed and maintained by **Futurion Solutions S.L.**
