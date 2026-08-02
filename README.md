@@ -9,6 +9,10 @@
 
 TrustPaste is a Manifest V3 browser extension for selecting a value from an imported business JSON profile and inserting it into the field you choose. Search uses paths, keys, and values; ranking can account for favorites, recent use, field context, language, scope, and character limits. Nothing is filled until you select an entry.
 
+## User guide
+
+For complete, illustrated instructions, see the [TrustPaste User Guide](docs/TrustPaste-User-Guide.pdf). It covers manual installation, configuration, JSON-profile preparation and import, picker use, safety boundaries, troubleshooting, reset, and removal for TrustPaste 1.0.4 on desktop Chromium browsers.
+
 ## Why TrustPaste is different
 
 Most autofill and "business profile" tools ask you to create an account and sync your data to their servers. **TrustPaste never does.** There is no server, no account, no cloud sync, no telemetry, and no analytics anywhere in the extension. Every operation — importing your JSON profile, searching, ranking, previewing, and inserting a value — runs entirely on your device.
@@ -44,13 +48,15 @@ TrustPaste requests only `storage`, `contextMenus`, `activeTab`, and `scripting`
 
 ## Install from this folder
 
-No build or package installation is required. Keep the complete `local-business-autofill` directory together.
+No build or package installation is required. Keep the complete TrustPaste folder together in a permanent local location.
 
-- Chrome or Chromium: open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select this directory.
-- Brave: open `brave://extensions`, enable Developer mode, choose **Load unpacked**, and select this directory.
-- Microsoft Edge: open `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select this directory.
+- Chrome or Chromium: open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the folder that contains `manifest.json`.
+- Brave: open `brave://extensions`, enable Developer mode, choose **Load unpacked**, and select the folder that contains `manifest.json`.
+- Microsoft Edge: open `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select the folder that contains `manifest.json`.
 
-Pin TrustPaste if you want its toolbar button visible. Shortcut assignments can be reviewed or changed at `chrome://extensions/shortcuts`, `brave://extensions/shortcuts`, or `edge://extensions/shortcuts`.
+Do not select the `manifest.json` file itself or a parent folder that only contains the extension. Pin TrustPaste if you want its toolbar button visible. Shortcut assignments can be reviewed or changed at `chrome://extensions/shortcuts`, `brave://extensions/shortcuts`, or `edge://extensions/shortcuts`. A managed browser may restrict Developer mode; contact your browser or IT administrator rather than bypassing organizational controls.
+
+After loading, confirm that the TrustPaste extension card is enabled and shows the expected version. To update an unpacked copy, retain or export any profile you need, replace the source folder, then use **Reload** on the extension card when the path is unchanged. Incognito access is optional and off by default; if enabled, remember that `chrome.storage.local` is shared with the regular extension process, so it does not create a separate or temporary profile store.
 
 ## Import a JSON profile
 
@@ -78,6 +84,8 @@ For example:
 The bundled [sample profile](examples/sample-profile.json) is a curated bilingual Futurion Solutions dataset with 521 searchable primitive entries covering the company, audiences, delivery stages, products, services, use cases, limitations, differentiators, and claim guardrails. It contains no pricing and no public company telephone number because no telephone is confirmed by the local source material. Telephone fields remain supported when an imported profile supplies a phone value.
 
 Existing installations do not receive profile changes automatically. If you previously imported the sample, re-import the updated file from the options page to receive the enriched entries. Imported files are treated as untrusted data and are rendered with DOM text nodes, never interpreted as HTML or code.
+
+Keep only information you are authorized to reuse in a profile, and validate the JSON before importing it. If you use an approved AI assistant to prepare non-sensitive profile data, review the result before import and never submit confidential, personal, regulated, credential, payment, or otherwise unauthorized information to an unapproved service.
 
 ## Use the picker
 
@@ -120,7 +128,11 @@ Contenteditable insertion intentionally creates text nodes, not markup. Editor-s
 
 ## Remove stored data
 
-In Options, **Reset TrustPaste** removes the imported profile, preferences, favorites, and recent history from the extension's `chrome.storage.local` key. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage. Export any profile you need first.
+In Options, **Reset TrustPaste** removes the imported profile, preferences, favorites, and recent history from the extension's `chrome.storage.local` key. This destructive action cannot restore deleted extension state, so retain a separate copy of any profile you need. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage.
+
+## Support
+
+For reproducible problems or support requests, use [GitHub Issues](https://github.com/futuriones/TrustPaste/issues). Include the browser and version, operating system, TrustPaste version, field type, invocation method, displayed message, and reproducible steps. Use a non-sensitive test page or sample JSON when helpful; never attach a real profile or confidential, personal, regulated, credential, or payment information.
 
 ## Development and verification
 
