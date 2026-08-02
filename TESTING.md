@@ -2,6 +2,31 @@
 
 Verification date: 2026-07-21. Environment: macOS, Google Chrome 150.0.7871.129 and Node.js 25.9.0. Profile enrichment used only local workspace sources; no website or other internet facts were imported.
 
+## 1.0.4 Chrome Web Store privacy and package acceptance
+
+The release candidate uses storage schema v2. Existing v0/v1 profile state must retain its profile,
+preferences, favorites, and recent history while adding `privacyConsent: null`. A consent record is
+only `{ policyVersion: '2026-08-02', acceptedAt: ISO-8601 }`; malformed values are repaired and a
+future schema is rejected to fresh safe defaults.
+
+Before importing, use Options to confirm that **Import profile** is disabled. Read the local-data
+notice, open both legal links, select the acknowledgment checkbox, and confirm Import becomes
+available. Begin an import and inspect `chrome.storage.local['lba'].privacyConsent` in Options
+DevTools; it must contain the current policy revision and timestamp. Reload Options with a
+deliberately stale `policyVersion` only in a disposable test profile to confirm re-acknowledgment is
+required. Reset TrustPaste afterward.
+
+For the exact upload artifact, inspect `TrustPaste-1.0.4.zip`, extract it to a clean directory, and
+parse the root `manifest.json`. Confirm it contains only `manifest.json`, `background/`, `content/`,
+`options/`, `shared/`, and the three referenced PNG icons. Do not upload documentation, tests,
+examples, Finder metadata, the source DOCX, or `icons/TrustPaste_logo.png`.
+
+Owner-only Store checks: publish the revised Privacy Policy at
+`https://solutions.futurion.es/privacy/` with revision `2026-08-02`; use that URL in the Chrome Web
+Store dashboard; disclose locally handled arbitrary-JSON and temporary page/form-context categories;
+state user-facing-only use with no sale or transfer; complete the Limited Use certification; and
+compare the published policy, dashboard answers, and final extension behavior before upload.
+
 ## 1.0.2 picker acknowledgement verification
 
 - Headless Chrome browser harness: **65/65 passed, 0 failed**.

@@ -14,7 +14,7 @@ const DEFAULT_PREFERENCES = Object.freeze({
 const MIN_RECENT_ENTRIES = 5;
 const MAX_RECENT_ENTRIES = 50;
 const UTF8_JSON_TYPE = 'application/json;charset=utf-8';
-const { OPTIONS_LABELS } = LBA.constants;
+const { OPTIONS_LABELS, PRIVACY_POLICY_VERSION } = LBA.constants;
 
 const elements = {};
 let currentState = null;
@@ -33,6 +33,7 @@ function cacheElements() {
     'repair-notice',
     'initialization-error',
     'profile-file',
+    'privacy-acknowledgment',
     'selected-file-name',
     'import-profile',
     'profile-status',
@@ -100,6 +101,16 @@ function setControlsDisabled(controls, isDisabled) {
   }
 }
 
+function hasCurrentPrivacyConsent(state) {
+  return state !== null
+    && state.privacyConsent !== null
+    && state.privacyConsent.policyVersion === PRIVACY_POLICY_VERSION;
+}
+
+function updateImportAvailability() {
+  elements['import-profile'].disabled = !elements['privacy-acknowledgment'].checked;
+}
+
 function restoreControlAvailability(controls) {
   for (const control of controls) {
     if (
@@ -107,6 +118,8 @@ function restoreControlAvailability(controls) {
       || control === elements['clear-profile']
     ) {
       control.disabled = !currentState || currentState.profile === null;
+    } else if (control === elements['import-profile']) {
+      control.disabled = !elements['privacy-acknowledgment'].checked;
     } else if (control === elements['clear-favorites']) {
       control.disabled = !currentState || currentState.favorites.length === 0;
     } else if (control === elements['clear-recent']) {
@@ -523,6 +536,8 @@ async function renderDiagnostics(state) {
 
 async function renderState(state) {
   currentState = state;
+  elements['privacy-acknowledgment'].checked = hasCurrentPrivacyConsent(state);
+  updateImportAvailability();
   renderPreferences(state.preferences);
   renderProfile(state.profile);
   renderFavorites(state.favorites);
@@ -537,6 +552,10 @@ async function refreshState() {
 
 async function importSelectedProfile() {
   clearSectionMessages('profile');
+  if (!elements['privacy-acknowledgment'].checked) {
+    setMessage(elements['profile-error'], OPTIONS_LABELS.PRIVACY_ACKNOWLEDGMENT_REQUIRED);
+    return;
+  }
   const [file] = elements['profile-file'].files;
   if (!file) {
     setMessage(elements['profile-error'], OPTIONS_LABELS.CHOOSE_JSON);
@@ -548,6 +567,7 @@ async function importSelectedProfile() {
   }
 
   await enqueueMutation(async () => {
+    await LBA.storage.savePrivacyConsent();
     let source;
     try {
       source = await readFileAsText(file);
@@ -596,6 +616,7 @@ async function importSelectedProfile() {
     elements['selected-file-name'].textContent = 'No file selected';
   }, [
     elements['profile-file'],
+    elements['privacy-acknowledgment'],
     elements['import-profile'],
     elements['clear-profile'],
     elements['reset-extension'],
@@ -779,6 +800,7 @@ function registerEventListeners() {
     elements['selected-file-name'].textContent = file ? file.name : 'No file selected';
     setMessage(elements['profile-error'], '');
   });
+  elements['privacy-acknowledgment'].addEventListener('change', updateImportAvailability);
   elements['import-profile'].addEventListener('click', importSelectedProfile);
   elements['export-profile'].addEventListener('click', exportProfile);
   elements['clear-profile'].addEventListener('click', clearStoredProfile);

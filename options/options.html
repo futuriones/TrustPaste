@@ -47,12 +47,26 @@
       </div>
 
       <div class="import-card">
+        <p class="import-notice">
+          A JSON profile can contain any data category, including personal, financial, health,
+          authentication, communications, location, browsing, website-content, or user-generated
+          data. TrustPaste keeps it in this browser’s local extension storage.
+        </p>
         <label class="file-picker" for="profile-file">
           <span class="file-picker__title">Choose a JSON profile</span>
           <span id="selected-file-name" class="file-picker__detail">No file selected</span>
           <input id="profile-file" type="file" accept=".json,application/json">
         </label>
-        <button id="import-profile" class="button button--primary" type="button">
+        <label class="privacy-acknowledgment" for="privacy-acknowledgment">
+          <input id="privacy-acknowledgment" type="checkbox">
+          <span>
+            I have read and acknowledge the
+            <a id="privacy-policy-link" href="https://solutions.futurion.es/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            and
+            <a id="terms-of-service-link" href="https://solutions.futurion.es/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.
+          </span>
+        </label>
+        <button id="import-profile" class="button button--primary" type="button" disabled>
           Import profile
         </button>
       </div>
@@ -249,6 +263,11 @@
 
   <footer class="page-footer">
     <p>Local-only by design · No network access · No analytics</p>
+    <p class="page-footer__legal">
+      <a href="https://solutions.futurion.es/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      <span aria-hidden="true">·</span>
+      <a href="https://solutions.futurion.es/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+    </p>
     <p class="page-footer__brand">TrustPaste by Futurion Solutions</p>
   </footer>
 

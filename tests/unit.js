@@ -486,6 +486,7 @@ test('storage: absent data returns fresh defaults without repair metadata', asyn
   const second = await LBA.storage.getState();
   assertEqual(first.repaired, false);
   assertEqual(first.state.profile, null);
+  assertEqual(first.state.privacyConsent, null);
   assertEqual(Object.hasOwn(first.state, 'repaired'), false);
   first.state.preferences.activeScope = 'changed';
   assertEqual(second.state.preferences.activeScope, '');
@@ -631,12 +632,106 @@ test('storage: malformed state is repaired, canonicalized, and reported once', a
   assertEqual((await LBA.storage.getState()).repaired, false);
 });
 
-test('storage: schema migration upgrades legacy state without mutation', () => {
+test('storage: schema migration upgrades v0 and v1 state without mutation', () => {
   const legacy = { schemaVersion: 0, favorites: ['company.name'] };
   const migrated = LBA.storage.migrate(legacy);
-  assertEqual(migrated.schemaVersion, 1);
+  assertEqual(migrated.schemaVersion, 2);
   assertEqual(legacy.schemaVersion, 0);
   assertDeepEqual(migrated.favorites, ['company.name']);
+
+  const versionOne = { schemaVersion: 1, favorites: ['company.site'] };
+  const upgraded = LBA.storage.migrate(versionOne);
+  assertEqual(upgraded.schemaVersion, 2);
+  assertEqual(upgraded.privacyConsent, null);
+  assertEqual(versionOne.schemaVersion, 1);
+  assertDeepEqual(upgraded.favorites, ['company.site']);
+});
+
+test('storage: v1 data is preserved while privacy consent starts unacknowledged', async () => {
+  await storageFake.clear();
+  const rawJson = { company: { name: 'Futurion' } };
+  const flattenedEntries = LBA.flatten.flattenJson(rawJson);
+  const profile = {
+    sourceFileName: 'legacy.json',
+    importedAt: '2026-08-01T12:00:00.000Z',
+    rawJson,
+    flattenedEntries,
+  };
+  await storageFake.set({
+    lba: {
+      schemaVersion: 1,
+      profile,
+      preferences: { preferredLanguage: 'es' },
+      favorites: ['company.name'],
+      recent: [{ path: 'company.name', lastUsedAt: '2026-08-01T12:00:00.000Z', useCount: 1 }],
+    },
+  });
+  const { state, repaired } = await LBA.storage.getState();
+  assertEqual(repaired, true);
+  assertEqual(state.schemaVersion, 2);
+  assertDeepEqual(state.profile, profile);
+  assertEqual(state.preferences.preferredLanguage, 'es');
+  assertDeepEqual(state.favorites, ['company.name']);
+  assertDeepEqual(state.recent, [{ path: 'company.name', lastUsedAt: '2026-08-01T12:00:00.000Z', useCount: 1 }]);
+  assertEqual(state.privacyConsent, null);
+});
+
+test('storage: privacy consent validates, persists the current revision, and stale revision remains visible', async () => {
+  await storageFake.clear();
+  await storageFake.set({
+    lba: {
+      schemaVersion: 2,
+      privacyConsent: { policyVersion: '2026-08-01', acceptedAt: '2026-08-01T12:00:00.000Z' },
+    },
+  });
+  const stale = await LBA.storage.getState();
+  assertDeepEqual(stale.state.privacyConsent, {
+    policyVersion: '2026-08-01',
+    acceptedAt: '2026-08-01T12:00:00.000Z',
+  });
+  const accepted = await LBA.storage.savePrivacyConsent();
+  assertEqual(accepted.policyVersion, LBA.constants.PRIVACY_POLICY_VERSION);
+  assertTrue(!Number.isNaN(Date.parse(accepted.acceptedAt)));
+  assertDeepEqual((await LBA.storage.getState()).state.privacyConsent, accepted);
+
+  await storageFake.set({
+    lba: { schemaVersion: 2, privacyConsent: { policyVersion: 7, acceptedAt: 'invalid' } },
+  });
+  const malformed = await LBA.storage.getState();
+  assertEqual(malformed.repaired, true);
+  assertEqual(malformed.state.privacyConsent, null);
+});
+
+test('storage: unsupported future schema resets to safe defaults', async () => {
+  await storageFake.clear();
+  await storageFake.set({
+    lba: { schemaVersion: 3, favorites: ['company.name'] },
+  });
+  const { state, repaired } = await LBA.storage.getState();
+  assertEqual(repaired, true);
+  assertEqual(state.schemaVersion, 2);
+  assertEqual(state.profile, null);
+  assertEqual(state.privacyConsent, null);
+  assertDeepEqual(state.favorites, []);
+});
+
+test('options: import is initially disabled and the legal links use the published HTTPS URLs', async () => {
+  const response = await fetch('../options/options.html');
+  assertTrue(response.ok, 'options page should load from the browser harness server');
+  const source = await response.text();
+  const optionsDocument = new DOMParser().parseFromString(source, 'text/html');
+  const importButton = optionsDocument.getElementById('import-profile');
+  const acknowledgment = optionsDocument.getElementById('privacy-acknowledgment');
+  assertTrue(importButton.disabled, 'import must be unavailable before acknowledgment');
+  assertEqual(acknowledgment.checked, false);
+  const privacyLink = optionsDocument.getElementById('privacy-policy-link');
+  const termsLink = optionsDocument.getElementById('terms-of-service-link');
+  assertEqual(privacyLink.href, LBA.constants.LEGAL_URLS.PRIVACY_POLICY);
+  assertEqual(termsLink.href, LBA.constants.LEGAL_URLS.TERMS_OF_SERVICE);
+  for (const link of [privacyLink, termsLink]) {
+    assertEqual(link.target, '_blank');
+    assertEqual(link.rel, 'noopener noreferrer');
+  }
 });
 
 test('storage: reset removes only lba and returns fresh state', async () => {

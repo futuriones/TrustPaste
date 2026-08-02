@@ -4,7 +4,12 @@ globalThis.LBA = globalThis.LBA || {};
 
 globalThis.LBA.constants = Object.freeze({
   STORAGE_KEY: 'lba',
-  SCHEMA_VERSION: 1,
+  SCHEMA_VERSION: 2,
+  PRIVACY_POLICY_VERSION: '2026-08-02',
+  LEGAL_URLS: Object.freeze({
+    PRIVACY_POLICY: 'https://solutions.futurion.es/privacy/',
+    TERMS_OF_SERVICE: 'https://solutions.futurion.es/terms/',
+  }),
 
   MESSAGE_TYPES: Object.freeze({
     OPEN_PICKER: 'LBA_OPEN_PICKER',
@@ -83,6 +88,8 @@ globalThis.LBA.constants = Object.freeze({
     RESET_PREFERENCES_FAILURE: 'Could not reset preferences',
     INITIALIZATION_FAILURE: 'The options page could not be initialized',
     RECENT_LIMIT: 'Maximum recent entries must be an integer from {min} to {max}.',
+    PRIVACY_ACKNOWLEDGMENT_REQUIRED:
+      'Read and acknowledge the Privacy Policy and Terms of Service before importing.',
   }),
 
   ERROR_MESSAGES: Object.freeze({

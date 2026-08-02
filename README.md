@@ -17,7 +17,7 @@ For complete, illustrated instructions, see the [TrustPaste User Guide](docs/Tru
 
 Most autofill and "business profile" tools ask you to create an account and sync your data to their servers. **TrustPaste never does.** There is no server, no account, no cloud sync, no telemetry, and no analytics anywhere in the extension. Every operation — importing your JSON profile, searching, ranking, previewing, and inserting a value — runs entirely on your device.
 
-Imported JSON, preferences, favorites, and recent paths stay in `chrome.storage.local`, isolated to the current browser profile. The only production `fetch` in the entire codebase loads the extension's own packaged `content/picker.css` stylesheet through `chrome.runtime.getURL()`; it is a local resource lookup, not a network request to a third party. There are no host permissions, so TrustPaste cannot read or send page content to anywhere outside your browser.
+Imported JSON, its source filename, preferences, favorites, recent-path metadata, and the privacy-policy acknowledgment stay in `chrome.storage.local`, isolated to the current browser profile. The only production `fetch` in the entire codebase loads the extension's own packaged `content/picker.css` stylesheet through `chrome.runtime.getURL()`; it is a local resource lookup, not a network request to a third party. There are no host permissions, so TrustPaste cannot read or send page content to anywhere outside your browser.
 
 The background service worker routes toolbar, shortcut, context-menu, and options requests. On invocation it injects the page-side modules under the temporary `activeTab` grant. It never receives your imported profile values, and value insertion happens entirely on the page side, in your browser.
 
@@ -45,6 +45,10 @@ TrustPaste does not upload files, solve or interact with CAPTCHA, click buttons,
 ## Permissions
 
 TrustPaste requests only `storage`, `contextMenus`, `activeTab`, and `scripting`. It has **no host permissions** — it cannot access any page until you explicitly invoke it on that page. Extension pages run under a strict content security policy (`script-src 'self'; object-src 'self'`); there is no remote code and no remote resource loading.
+
+## Privacy acknowledgment
+
+Before the first import, Options asks you to acknowledge the [Privacy Policy](https://solutions.futurion.es/privacy/) (revision `2026-08-02`) and [Terms of Service](https://solutions.futurion.es/terms/). Import remains unavailable until the checkbox is selected, and a revised policy requires acknowledgment again. You may import arbitrary JSON, so only import data you are authorized to use; it can contain sensitive categories even though TrustPaste stores and processes it locally.
 
 ## Install from this folder
 
@@ -128,7 +132,7 @@ Contenteditable insertion intentionally creates text nodes, not markup. Editor-s
 
 ## Remove stored data
 
-In Options, **Reset TrustPaste** removes the imported profile, preferences, favorites, and recent history from the extension's `chrome.storage.local` key. This destructive action cannot restore deleted extension state, so retain a separate copy of any profile you need. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage.
+In Options, **Reset TrustPaste** removes the imported profile, preferences, favorites, recent history, and privacy-policy acknowledgment from the extension's `chrome.storage.local` key. This destructive action cannot restore deleted extension state, so retain a separate copy of any profile you need. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage.
 
 ## Support
 

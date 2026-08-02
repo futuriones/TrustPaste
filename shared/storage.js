@@ -8,7 +8,7 @@ globalThis.LBA = globalThis.LBA || {};
   }
 
   const STORAGE_KEY = 'lba';
-  const SCHEMA_VERSION = 1;
+  const { SCHEMA_VERSION, PRIVACY_POLICY_VERSION } = globalThis.LBA.constants;
   const DEFAULT_MAX_RECENT_ENTRIES = 20;
   const INSERT_MODES = new Set(['replace', 'atCursor']);
   const PREFERRED_LANGUAGES = new Set(['auto', 'en', 'es', 'none']);
@@ -41,6 +41,7 @@ globalThis.LBA = globalThis.LBA || {};
       preferences: createDefaultPreferences(),
       favorites: [],
       recent: [],
+      privacyConsent: null,
     };
   }
 
@@ -242,6 +243,24 @@ globalThis.LBA = globalThis.LBA || {};
     return sanitized;
   }
 
+  function sanitizePrivacyConsent(privacyConsent) {
+    if (privacyConsent === null || privacyConsent === undefined) {
+      return null;
+    }
+    if (
+      !isRecord(privacyConsent)
+      || typeof privacyConsent.policyVersion !== 'string'
+      || privacyConsent.policyVersion.length === 0
+      || !isValidDateString(privacyConsent.acceptedAt)
+    ) {
+      return null;
+    }
+    return {
+      policyVersion: privacyConsent.policyVersion,
+      acceptedAt: privacyConsent.acceptedAt,
+    };
+  }
+
   function migrate(state) {
     if (!isRecord(state)) {
       return createDefaultState();
@@ -250,6 +269,12 @@ globalThis.LBA = globalThis.LBA || {};
     switch (state.schemaVersion) {
       case SCHEMA_VERSION:
         return { ...state };
+      case 1:
+        return {
+          ...state,
+          schemaVersion: SCHEMA_VERSION,
+          privacyConsent: null,
+        };
       case undefined:
       case 0:
         return { ...state, schemaVersion: SCHEMA_VERSION };
@@ -268,6 +293,7 @@ globalThis.LBA = globalThis.LBA || {};
       preferences,
       favorites: sanitizeFavorites(migrated.favorites),
       recent: sanitizeRecent(migrated.recent, preferences.maxRecentEntries),
+      privacyConsent: sanitizePrivacyConsent(migrated.privacyConsent),
     };
   }
 
@@ -442,6 +468,17 @@ globalThis.LBA = globalThis.LBA || {};
     return state.recent;
   }
 
+  async function savePrivacyConsent() {
+    const { state } = await getState();
+    const privacyConsent = {
+      policyVersion: PRIVACY_POLICY_VERSION,
+      acceptedAt: new Date().toISOString(),
+    };
+    state.privacyConsent = privacyConsent;
+    await persistState(state);
+    return privacyConsent;
+  }
+
   async function resetAll() {
     await chrome.storage.local.remove(STORAGE_KEY);
     return createDefaultState();
@@ -461,6 +498,7 @@ globalThis.LBA = globalThis.LBA || {};
     cleanupFavorites,
     recordRecentUse,
     clearRecent,
+    savePrivacyConsent,
     resetAll,
     migrate,
     getStorageEstimate,
