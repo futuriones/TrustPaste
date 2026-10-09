@@ -29,15 +29,15 @@ TrustPaste is designed to refuse to touch sensitive fields, not just to avoid th
 
 TrustPaste refuses:
 
-- **Password fields**
-- **Payment fields** — detected via `autocomplete` tokens such as `cc-number`, `cc-csc`, and `cc-exp`
+- **Password fields**, including any field whose `autocomplete` is `current-password`, `new-password`, or `one-time-code` (for example a password field revealed as plain text)
+- **Payment fields** — detected via `autocomplete` tokens such as `cc-number`, `cc-csc`, and `cc-exp`, on inputs and textareas alike
 - Hidden inputs
 - File inputs
 - Checkboxes and radio buttons
 - Date, datetime-local, month, week, and time controls
 - Color and range controls
 - Buttons (`submit`, `button`, `reset`, `image`)
-- Disabled fields
+- Disabled fields, including controls disabled by an enclosing `<fieldset disabled>`
 - Readonly fields
 
 TrustPaste does not upload files, solve or interact with CAPTCHA, click buttons, accept terms, or submit forms — under any circumstance.
@@ -64,7 +64,7 @@ After loading, confirm that the TrustPaste extension card is enabled and shows t
 
 ## Import a JSON profile
 
-Open the extension's **Details** page and choose **Extension options**, or use the options link shown when no profile is present. Select a local `.json` file and choose **Import profile**. The page reports the flattened entry count and shows a safe text-only preview. JSON must have an object or array at its root; nested objects and arrays are supported, and primitive leaves become selectable values.
+Open the extension's **Details** page and choose **Extension options**, or use the options link shown when no profile is present. Select a local `.json` file and choose **Import profile**. The page reports the flattened entry count and shows a safe text-only preview. JSON must have an object or array at its root; nested objects and arrays are supported, and primitive leaves become selectable values. Files larger than 5 MiB are rejected before they are read.
 
 For example:
 
@@ -85,7 +85,7 @@ For example:
 }
 ```
 
-The bundled [sample profile](examples/sample-profile.json) is a curated bilingual Futurion Solutions dataset with 521 searchable primitive entries covering the company, audiences, delivery stages, products, services, use cases, limitations, differentiators, and claim guardrails. It contains no pricing and no public company telephone number because no telephone is confirmed by the local source material. Telephone fields remain supported when an imported profile supplies a phone value.
+The bundled [sample profile](examples/sample-profile.json) is a curated bilingual Futurion Solutions dataset with 376 searchable primitive entries covering the company, audiences, delivery stages, products, services, use cases, limitations, differentiators, and claim guardrails. It contains no pricing and no public company telephone number because no telephone is confirmed by the local source material. Telephone fields remain supported when an imported profile supplies a phone value.
 
 Existing installations do not receive profile changes automatically. If you previously imported the sample, re-import the updated file from the options page to receive the enriched entries. Imported files are treated as untrusted data and are rendered with DOM text nodes, never interpreted as HTML or code.
 
@@ -99,7 +99,7 @@ Focus a supported field, then use one of these methods:
 - Select **Insert business data** from the editable field's context menu.
 - Click the pinned toolbar button. Toolbar and shortcut invocation use the focused field, or the last supported field if focus has moved to a non-field browser/page control. A currently focused unsupported field still receives its precise unsupported-type message.
 
-Type one or more words to search. Every word must match the normalized path, label, or value. Use Up/Down and Page Up/Page Down to move, Enter to insert, Escape to close, or click a result. The picker supports Replace and At cursor modes. Long previews can be expanded. Values over a real `maxlength` are not inserted until **Insert anyway** is selected.
+Type one or more words to search. Every word must match the normalized path, label, or value. Use Up/Down and Page Up/Page Down to move, Enter to insert, Escape to close, or click a result. The picker supports Replace and At cursor modes. Long previews can be expanded. Values over a real `maxlength` are not inserted until **Insert anyway** is selected; in At cursor mode the limit is checked against the resulting field value. A field that rejects the value (for example text in a number field) is left unchanged and the picker reports the failure. The picker lives in a closed shadow root so page scripts cannot read it.
 
 Starred entries appear under Favorites. Successfully inserted paths are added to Recent locally; profile values are not duplicated in recent history. The options page can clear either list.
 
@@ -125,14 +125,14 @@ Contenteditable insertion intentionally creates text nodes, not markup. Editor-s
 - **Unsupported field message:** the named control is intentionally protected; choose a supported text field instead.
 - **Cross-origin iframe message:** open the framed application directly if appropriate, then invoke the extension there.
 - **`!` badge:** inspect the toolbar title. The current tab is restricted, a PDF, or rejected content-script injection.
-- **Storage error:** confirm extension storage is enabled and reload the extension. A repaired malformed state is reported once; reset and re-import if needed.
+- **Storage error:** confirm extension storage is enabled and reload the extension. A repaired malformed state is reported once; reset and re-import if needed. Data saved by a newer TrustPaste version is never reset or overwritten: the extension reports it and refuses writes until you update it or choose **Reset extension**.
 - **No results:** clear or broaden the search and check language/scope/null preferences.
 - **Shortcut does not open:** check the browser extension-shortcut page for a conflict or changed assignment.
 - **Rich editor reverts text:** use its supported plain-text paste workflow; editor-specific APIs are deliberately not integrated.
 
 ## Remove stored data
 
-In Options, **Reset TrustPaste** removes the imported profile, preferences, favorites, recent history, and privacy-policy acknowledgment from the extension's `chrome.storage.local` key. This destructive action cannot restore deleted extension state, so retain a separate copy of any profile you need. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage.
+In Options, **Reset extension** removes the imported profile, preferences, favorites, recent history, and privacy-policy acknowledgment from the extension's `chrome.storage.local` key. This destructive action cannot restore deleted extension state, so retain a separate copy of any profile you need. To remove all extension storage and code, remove the extension from the browser's extensions page; browser removal clears its isolated local storage.
 
 ## Support
 

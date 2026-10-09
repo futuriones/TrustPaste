@@ -2,6 +2,15 @@
 
 globalThis.LBA = globalThis.LBA || {};
 
+// The picker uses a closed shadow root, so the harness records each root it creates.
+const recordedShadowRoots = new WeakMap();
+const nativeAttachShadow = Element.prototype.attachShadow;
+Element.prototype.attachShadow = function attachShadowForHarness(init) {
+  const root = nativeAttachShadow.call(this, init);
+  recordedShadowRoots.set(this, root);
+  return root;
+};
+
 function clone(value) {
   return structuredClone(value);
 }
@@ -81,6 +90,9 @@ globalThis.chrome = {
     lastError: null,
     getURL(path) {
       return new URL(`../${path}`, globalThis.location.href).href;
+    },
+    getManifest() {
+      return { version: 'harness' };
     },
     onMessage: {
       addListener(listener) {
@@ -702,16 +714,46 @@ test('storage: privacy consent validates, persists the current revision, and sta
   assertEqual(malformed.state.privacyConsent, null);
 });
 
-test('storage: unsupported future schema resets to safe defaults', async () => {
+test('storage: unsupported future schema is preserved and refuses writes', async () => {
   await storageFake.clear();
-  await storageFake.set({
-    lba: { schemaVersion: 3, favorites: ['company.name'] },
-  });
-  const { state, repaired } = await LBA.storage.getState();
-  assertEqual(repaired, true);
+  const future = {
+    schemaVersion: 3,
+    favorites: ['company.name'],
+    profile: { opaque: 'written by a newer build' },
+  };
+  await storageFake.set({ lba: future });
+  const { state, repaired, futureSchema } = await LBA.storage.getState();
+  assertEqual(futureSchema, true);
+  assertEqual(repaired, false);
   assertEqual(state.schemaVersion, 2);
   assertEqual(state.profile, null);
-  assertEqual(state.privacyConsent, null);
+  assertDeepEqual(storageFake.snapshot().lba, future, 'reading never overwrites newer data');
+
+  const newerVersionMessage = 'newer version';
+  await assertRejects(() => LBA.storage.toggleFavorite('company.name'), newerVersionMessage);
+  await assertRejects(
+    () => LBA.storage.saveProfile('x.json', {}, [makeEntry('company.name')]),
+    newerVersionMessage,
+  );
+  await assertRejects(() => LBA.storage.savePreferences({ insertMode: 'atCursor' }), newerVersionMessage);
+  await assertRejects(() => LBA.storage.recordRecentUse('company.name'), newerVersionMessage);
+  await assertRejects(() => LBA.storage.cleanupFavorites([]), newerVersionMessage);
+  await assertRejects(() => LBA.storage.clearProfile(), newerVersionMessage);
+  await assertRejects(() => LBA.storage.clearRecent(), newerVersionMessage);
+  await assertRejects(() => LBA.storage.savePrivacyConsent(), newerVersionMessage);
+  assertDeepEqual(storageFake.snapshot().lba, future, 'rejected writes leave newer data intact');
+
+  await LBA.storage.resetAll();
+  assertEqual(Object.hasOwn(storageFake.snapshot(), 'lba'), false, 'explicit reset still works');
+});
+
+test('storage: malformed non-integer schema versions still reset to safe defaults', async () => {
+  await storageFake.clear();
+  await storageFake.set({ lba: { schemaVersion: 'three', favorites: ['company.name'] } });
+  const { state, repaired, futureSchema } = await LBA.storage.getState();
+  assertEqual(futureSchema, false);
+  assertEqual(repaired, true);
+  assertEqual(state.schemaVersion, 2);
   assertDeepEqual(state.favorites, []);
 });
 
@@ -796,6 +838,10 @@ function getPickerHost() {
   return document.querySelector('[data-lba-picker-host]');
 }
 
+function getPickerShadow() {
+  return recordedShadowRoots.get(getPickerHost());
+}
+
 test('picker: repeated asynchronous opens create one host and cache CSS', async () => {
   const originalFetch = globalThis.fetch;
   let fetchCount = 0;
@@ -824,7 +870,8 @@ test('picker: repeated asynchronous opens create one host and cache CSS', async 
   ]);
   assertEqual(document.querySelectorAll('[data-lba-picker-host]').length, 1);
   assertEqual(fetchCount, 1);
-  assertTrue(getPickerHost().shadowRoot !== null, 'picker shadow root is open');
+  assertEqual(getPickerHost().shadowRoot, null, 'page script cannot reach the picker shadow root');
+  assertTrue(getPickerShadow() !== undefined, 'the harness recorded the closed picker root');
   LBA.picker.close();
   await LBA.picker.open({
     targetEl: secondTarget,
@@ -854,7 +901,7 @@ test('picker: search renders ranked options and keyboard navigation wraps', asyn
     fieldContext: { labelText: 'Company', inputType: 'text' },
     state: createPickerState(entries),
   });
-  const shadow = getPickerHost().shadowRoot;
+  const shadow = getPickerShadow();
   const search = shadow.querySelector('.search');
   search.value = 'company';
   search.dispatchEvent(new Event('input', { bubbles: true }));
@@ -890,7 +937,7 @@ test('picker: stray Ctrl/Cmd+letter chords still type into search, real chords p
     fieldContext: { inputType: 'text' },
     state: createPickerState([entry]),
   });
-  const search = getPickerHost().shadowRoot.querySelector('.search');
+  const search = getPickerShadow().querySelector('.search');
   search.focus();
   for (const key of ['w', 't', 'y', 's']) {
     search.dispatchEvent(new KeyboardEvent('keydown', {
@@ -933,7 +980,7 @@ test('picker: keystrokes inside the picker never reach bubble-phase page listene
       fieldContext: { inputType: 'text' },
       state: createPickerState([entry]),
     });
-    const search = getPickerHost().shadowRoot.querySelector('.search');
+    const search = getPickerShadow().querySelector('.search');
     search.focus();
     const event = new KeyboardEvent('keydown', {
       key: 'w',
@@ -968,7 +1015,7 @@ test('picker: favorites and recents skip stale paths and remain separate section
       ],
     }),
   });
-  const shadow = getPickerHost().shadowRoot;
+  const shadow = getPickerShadow();
   assertEqual(shadow.querySelectorAll('[role="option"]').length, 2);
   assertDeepEqual(
     [...shadow.querySelectorAll('.section-title')].map((node) => node.textContent),
@@ -994,7 +1041,7 @@ test('picker: Escape restores focus while outside pointerdown preserves clicked 
     fieldContext: { inputType: 'text' },
     state,
   });
-  getPickerHost().shadowRoot.querySelector('.panel').dispatchEvent(
+  getPickerShadow().querySelector('.panel').dispatchEvent(
     new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
   );
   assertEqual(getPickerHost(), null);
@@ -1029,7 +1076,7 @@ test('picker: Tab stays contained and null entries follow the preference', async
     fieldContext: { inputType: 'text' },
     state,
   });
-  let shadow = getPickerHost().shadowRoot;
+  let shadow = getPickerShadow();
   assertEqual(shadow.querySelectorAll('[role="option"]').length, 1);
   const search = shadow.querySelector('.search');
   const lastButton = [...shadow.querySelectorAll('button')].at(-1);
@@ -1047,7 +1094,7 @@ test('picker: Tab stays contained and null entries follow the preference', async
     fieldContext: { inputType: 'text' },
     state,
   });
-  shadow = getPickerHost().shadowRoot;
+  shadow = getPickerShadow();
   assertEqual(shadow.querySelectorAll('[role="option"]').length, 2);
   const unsafeQuery = '<img src=x onerror=alert(1)>';
   shadow.querySelector('.search').value = unsafeQuery;
@@ -1077,7 +1124,7 @@ test('picker: automatic page language is resolved before ranking', async () => {
       favorites: [english.path, spanish.path],
     }),
   });
-  const firstRow = getPickerHost().shadowRoot.querySelector('[role="option"]');
+  const firstRow = getPickerShadow().querySelector('[role="option"]');
   assertEqual(firstRow.dataset.path, spanish.path);
   LBA.picker.close();
   target.remove();
@@ -1098,7 +1145,7 @@ test('picker: oversized confirmation inserts untruncated and records only the pa
       favorites: [entry.path],
     }),
   });
-  const shadow = getPickerHost().shadowRoot;
+  const shadow = getPickerShadow();
   shadow.querySelector('[role="option"]').click();
   assertEqual(target.value, 'old');
   const alert = shadow.querySelector('[role="alert"]');
@@ -1136,7 +1183,7 @@ test('picker: saved contenteditable range survives Shadow DOM focus', async () =
       favorites: [entry.path],
     }),
   });
-  const search = getPickerHost().shadowRoot.querySelector('.search');
+  const search = getPickerShadow().querySelector('.search');
   search.dispatchEvent(new KeyboardEvent('keydown', {
     key: 'Enter',
     bubbles: true,
@@ -1233,7 +1280,7 @@ test('insertion: removed target and maxlength rejection are precise and non-muta
   document.body.append(input);
   assertDeepEqual(
     LBA.insertion.insertValue(input, 'lengthy', { mode: 'replace' }),
-    { ok: false, reason: 'Value is 7 characters, field allows 3.' },
+    { ok: false, reason: 'Value is 7 characters, field allows 3.', code: 'VALUE_TOO_LONG' },
   );
   assertEqual(input.value, 'old');
   assertEqual(
@@ -1725,6 +1772,275 @@ test('service worker: command, context menu, and options listeners route frozen 
     .sort();
   assertDeepEqual(messages, ['command', 'contextMenu']);
   assertEqual(serviceWorkerCalls.filter((call) => call[0] === 'openOptionsPage').length, 1);
+});
+
+// Earlier tests that insert with Enter leave a one-shot keyup guard armed for a moment;
+// consume any leftovers so each test observes only its own guard.
+function drainEnterKeyupGuards() {
+  let reached = false;
+  const probe = () => { reached = true; };
+  document.addEventListener('keyup', probe);
+  for (let attempt = 0; attempt < 10 && !reached; attempt += 1) {
+    document.dispatchEvent(new KeyboardEvent('keyup', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    }));
+  }
+  document.removeEventListener('keyup', probe);
+}
+
+test('picker: Enter insertion swallows only the matching Enter keyup', async () => {
+  drainEnterKeyupGuards();
+  await storageFake.clear();
+  const target = document.createElement('textarea');
+  document.body.append(target);
+  const entry = makeEntry('company.name', 'Futurion');
+  await LBA.picker.open({
+    targetEl: target,
+    fieldContext: { inputType: 'textarea' },
+    state: createPickerState([entry], { favorites: [entry.path] }),
+  });
+  const keyups = [];
+  target.addEventListener('keyup', (event) => keyups.push(event.key));
+  getPickerShadow().querySelector('.search').dispatchEvent(new KeyboardEvent('keydown', {
+    key: 'Enter',
+    bubbles: true,
+  }));
+  await flushAsyncWork();
+  assertEqual(target.value, 'Futurion');
+  target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true, cancelable: true }));
+  assertDeepEqual(keyups, [], 'the Enter keyup that follows insertion must not reach the page');
+  target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true, cancelable: true }));
+  assertDeepEqual(keyups, ['Enter'], 'only one Enter keyup is swallowed');
+  target.remove();
+});
+
+test('picker: mouse insertion does not swallow a later Enter keyup', async () => {
+  drainEnterKeyupGuards();
+  await storageFake.clear();
+  const target = document.createElement('textarea');
+  document.body.append(target);
+  const entry = makeEntry('company.name', 'Futurion');
+  await LBA.picker.open({
+    targetEl: target,
+    fieldContext: { inputType: 'textarea' },
+    state: createPickerState([entry], { favorites: [entry.path] }),
+  });
+  const keyups = [];
+  target.addEventListener('keyup', (event) => keyups.push(event.key));
+  getPickerShadow().querySelector('[role="option"]').click();
+  await flushAsyncWork();
+  assertEqual(target.value, 'Futurion');
+  target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }));
+  assertDeepEqual(keyups, ['Enter']);
+  target.remove();
+});
+
+test('field context: autocomplete secrets and payment hints block every field kind', () => {
+  const cases = [
+    ['input', { autocomplete: 'new-password' }],
+    ['input', { autocomplete: 'current-password' }],
+    ['input', { autocomplete: 'one-time-code' }],
+    ['input', { autocomplete: 'section-a cc-number' }],
+    ['textarea', { autocomplete: 'cc-number' }],
+  ];
+  for (const [tagName, attributes] of cases) {
+    const field = document.createElement(tagName);
+    if (tagName === 'input') {
+      field.type = 'text';
+    }
+    for (const [name, value] of Object.entries(attributes)) {
+      field.setAttribute(name, value);
+    }
+    document.body.append(field);
+    assertEqual(
+      LBA.fieldContext.classifyField(field).isSupported,
+      false,
+      `${tagName} ${JSON.stringify(attributes)}`,
+    );
+    const result = LBA.insertion.insertValue(field, 'value', { mode: 'replace' });
+    assertEqual(result.ok, false);
+    assertEqual(field.value, '', 'a protected field is never written');
+    field.remove();
+  }
+
+  const plain = document.createElement('input');
+  plain.type = 'text';
+  plain.setAttribute('autocomplete', 'name');
+  assertEqual(LBA.fieldContext.classifyField(plain).isSupported, true);
+
+  const both = document.createElement('input');
+  both.type = 'text';
+  both.setAttribute('autocomplete', 'new-password cc-number');
+  assertEqual(
+    LBA.fieldContext.classifyField(both).reason,
+    LBA.constants.UNSUPPORTED_FIELD_MESSAGES.SECURE_OR_PAYMENT,
+  );
+});
+
+test('field context: controls disabled by an ancestor fieldset are refused', () => {
+  const fieldset = document.createElement('fieldset');
+  const input = document.createElement('input');
+  fieldset.append(input);
+  document.body.append(fieldset);
+  assertEqual(LBA.fieldContext.classifyField(input).isSupported, true);
+  fieldset.disabled = true;
+  const classification = LBA.fieldContext.classifyField(input);
+  assertEqual(classification.isSupported, false);
+  assertEqual(classification.reason, LBA.constants.UNSUPPORTED_FIELD_MESSAGES.DISABLED);
+  assertEqual(LBA.insertion.insertValue(input, 'value', { mode: 'replace' }).ok, false);
+  assertEqual(input.value, '');
+  fieldset.remove();
+});
+
+test('insertion: at-cursor maxlength checks the resulting value, not just the inserted text', () => {
+  const input = document.createElement('input');
+  input.maxLength = 10;
+  input.value = 'Hello ';
+  document.body.append(input);
+  input.setSelectionRange(6, 6);
+
+  const rejected = LBA.insertion.insertValue(input, 'abcdefgh', { mode: 'atCursor' });
+  assertEqual(rejected.ok, false);
+  assertEqual(rejected.code, 'VALUE_TOO_LONG');
+  assertEqual(rejected.reason, 'Resulting value would be 14 characters, field allows 10.');
+  assertEqual(input.value, 'Hello ', 'a rejected insertion does not mutate the field');
+
+  const fits = LBA.insertion.insertValue(input, 'abcd', { mode: 'atCursor' });
+  assertEqual(fits.ok, true);
+  assertEqual(input.value, 'Hello abcd');
+
+  input.value = 'Hello ';
+  input.setSelectionRange(6, 6);
+  const confirmed = LBA.insertion.insertValue(input, 'abcdefgh', {
+    mode: 'atCursor',
+    confirmOversized: true,
+  });
+  assertEqual(confirmed.ok, true);
+  assertEqual(input.value, 'Hello abcdefgh');
+
+  input.value = 'Hello ';
+  const replace = LBA.insertion.insertValue(input, 'abcdefgh', { mode: 'replace' });
+  assertEqual(replace.ok, true, 'replace mode compares only the inserted value');
+  input.remove();
+});
+
+test('insertion: a number field that rejects the value is left unchanged and reports failure', () => {
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.value = '5';
+  document.body.append(input);
+  const events = [];
+  input.addEventListener('input', () => events.push('input'));
+  input.addEventListener('change', () => events.push('change'));
+
+  const result = LBA.insertion.insertValue(input, '+34 600 000 000', { mode: 'replace' });
+  assertDeepEqual(result, {
+    ok: false,
+    reason: LBA.constants.ERROR_MESSAGES.VALUE_REJECTED,
+  });
+  assertEqual(input.value, '5');
+  assertDeepEqual(events, [], 'no events are dispatched for a rejected value');
+
+  assertEqual(LBA.insertion.insertValue(input, '42', { mode: 'replace' }).ok, true);
+  assertEqual(input.value, '42');
+  input.remove();
+});
+
+test('content: invocation and focus tracking reach fields inside open shadow roots', async () => {
+  const entry = makeEntry('company.name', 'Futurion');
+  await storageFake.clear();
+  await LBA.storage.saveProfile('test.json', {}, [entry]);
+  const host = document.createElement('div');
+  const root = host.attachShadow({ mode: 'open' });
+  const inner = document.createElement('input');
+  root.append(inner);
+  const outside = document.createElement('button');
+  document.body.append(host, outside);
+  inner.focus();
+  assertEqual(document.activeElement, host, 'the page only sees the shadow host');
+
+  const originalPicker = LBA.picker;
+  let openedTarget = null;
+  LBA.picker = { open(options) { openedTarget = options.targetEl; } };
+  await dispatchRuntimeMessage({
+    type: LBA.constants.MESSAGE_TYPES.OPEN_PICKER,
+    trigger: 'action',
+  });
+  assertEqual(openedTarget, inner);
+
+  openedTarget = null;
+  outside.focus();
+  await dispatchRuntimeMessage({
+    type: LBA.constants.MESSAGE_TYPES.OPEN_PICKER,
+    trigger: 'command',
+  });
+  assertEqual(openedTarget, inner, 'focusin tracking remembers the shadow control');
+  LBA.picker = originalPicker;
+  host.remove();
+  outside.remove();
+});
+
+test('content: data from a newer schema shows a clear message and never opens the picker', async () => {
+  await storageFake.clear();
+  const future = { schemaVersion: 9, profile: { opaque: true } };
+  await storageFake.set({ lba: future });
+  const field = document.createElement('input');
+  document.body.append(field);
+  field.focus();
+  const notifications = [];
+  const originalNotifications = LBA.notifications;
+  const originalPicker = LBA.picker;
+  let opened = false;
+  LBA.notifications = { show(message) { notifications.push(message); } };
+  LBA.picker = { open() { opened = true; } };
+  await dispatchRuntimeMessage({
+    type: LBA.constants.MESSAGE_TYPES.OPEN_PICKER,
+    trigger: 'action',
+  });
+  assertEqual(opened, false);
+  assertDeepEqual(notifications, [LBA.constants.ERROR_MESSAGES.FUTURE_SCHEMA]);
+  assertDeepEqual(storageFake.snapshot().lba, future);
+  LBA.notifications = originalNotifications;
+  LBA.picker = originalPicker;
+  field.remove();
+});
+
+test('options: import rejects an oversized file before any state is saved', async () => {
+  await storageFake.clear();
+  const frame = document.createElement('iframe');
+  frame.src = '../options/options.html';
+  document.body.append(frame);
+  await new Promise((resolve) => frame.addEventListener('load', resolve, { once: true }));
+  await flushAsyncWork();
+  // The page registers its handlers before it first needs the extension APIs, so the
+  // chrome fake is attached afterwards; only the size check runs before any API call.
+  frame.contentWindow.chrome = globalThis.chrome;
+  const optionsDocument = frame.contentDocument;
+  const acknowledgment = optionsDocument.getElementById('privacy-acknowledgment');
+  acknowledgment.checked = true;
+  acknowledgment.dispatchEvent(new Event('change', { bubbles: true }));
+
+  const transfer = new DataTransfer();
+  transfer.items.add(new File(
+    [new Uint8Array(LBA.constants.MAX_IMPORT_BYTES + 1)],
+    'huge.json',
+    { type: 'application/json' },
+  ));
+  optionsDocument.getElementById('profile-file').files = transfer.files;
+  optionsDocument.getElementById('import-profile').click();
+  await flushAsyncWork();
+  await flushAsyncWork();
+
+  const message = optionsDocument.getElementById('profile-error').textContent;
+  assertTrue(message.includes('larger than'), `unexpected message: ${message}`);
+  assertEqual(
+    Object.hasOwn(storageFake.snapshot(), 'lba'),
+    false,
+    'neither consent nor profile data was written',
+  );
+  frame.remove();
 });
 
 async function runTests() {

@@ -2,19 +2,43 @@
 
 Verification date: 2026-07-21. Environment: macOS, Google Chrome 150.0.7871.129 and Node.js 25.9.0. Profile enrichment used only local workspace sources; no website or other internet facts were imported.
 
+## 1.0.5 audit-fix verification (2026-10-09)
+
+Environment: macOS, Google Chrome headless driven over the DevTools protocol with focus emulation enabled, and Node.js 26.10.0.
+
+Automated:
+
+- Headless Chrome browser harness: **82/82 passed, 0 failed** (`data-test-status="passed"`, `data-test-failures="0"`). The 72 pre-existing tests also passed 72/72 on the untouched 1.0.4 tree under the same runner.
+- Running the new `tests/unit.js` against the 1.0.4 sources fails 12 tests, so the new coverage detects the defects it targets.
+- `node --check` passed on all 15 JavaScript files.
+
+Static:
+
+- `manifest.json` parses with `manifest_version` 3 and version `1.0.5`; permissions are exactly `storage`, `contextMenus`, `activeTab`, `scripting`; `host_permissions` is absent; the CSP is unchanged; every referenced file exists. Icon slots 16/32/48/128 now reference `TrustPaste_logo_32.png`, `TrustPaste_logo_96.png`, and the square `TrustPaste_logo_128.png`.
+- A scan of `background/`, `content/`, `shared/`, and `options/` found no `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, or `new Function`, and no remote URL other than the two legal-page constants. The only `console` call is the existing fixed-string service-worker diagnostic.
+- `INJECTED_FILES` order is unchanged.
+- `TrustPaste-1.0.5.zip` differs from the 1.0.4 package only by `icons/TrustPaste_logo_512.png` replaced with `icons/TrustPaste_logo_128.png`, and each packaged file is byte-identical to the working tree.
+- Snyk Code (MCP) reports 0 issues on the final tree.
+- `examples/sample-profile.json` has **376** primitive entries, computed from the file this run.
+
+Changes covered by the new tests: closed picker shadow root, Enter-keyup suppression, `autocomplete` secret and payment refusal on every field kind, `fieldset disabled` refusal, at-cursor maxlength against the resulting value, number-field rejection, focus resolution inside open shadow roots, preservation of newer-schema storage with write refusal, and the 5 MiB import limit.
+
+Manual (pending, requires the visible **Load unpacked** flow): Enter insertion on a page that submits on keyup, a password field revealed as text, a field inside `fieldset[disabled]`, a number field, an open-shadow-DOM field, and the new 128px icon on `chrome://extensions`.
+
 ## 1.0.4 Chrome Web Store privacy and package acceptance
 
 The release candidate uses storage schema v2. Existing v0/v1 profile state must retain its profile,
 preferences, favorites, and recent history while adding `privacyConsent: null`. A consent record is
-only `{ policyVersion: '2026-08-02', acceptedAt: ISO-8601 }`; malformed values are repaired and a
-future schema is rejected to fresh safe defaults.
+only `{ policyVersion: '2026-08-02', acceptedAt: ISO-8601 }`; malformed values are repaired. A stored
+schema newer than the extension understands is left untouched: reads return in-memory defaults and
+every write is refused until the extension is updated or **Reset extension** is used.
 
 Before importing, use Options to confirm that **Import profile** is disabled. Read the local-data
 notice, open both legal links, select the acknowledgment checkbox, and confirm Import becomes
 available. Begin an import and inspect `chrome.storage.local['lba'].privacyConsent` in Options
 DevTools; it must contain the current policy revision and timestamp. Reload Options with a
 deliberately stale `policyVersion` only in a disposable test profile to confirm re-acknowledgment is
-required. Reset TrustPaste afterward.
+required. Use **Reset extension** afterward.
 
 For the exact upload artifact, inspect `TrustPaste-1.0.4.zip`, extract it to a clean directory, and
 parse the root `manifest.json`. Confirm it contains only `manifest.json`, `background/`, `content/`,
@@ -34,8 +58,8 @@ compare the published policy, dashboard answers, and final extension behavior be
 - A valid synchronous `LBA_OPEN_PICKER_ACK` clears the action badge without an unreachable diagnostic. Missing receivers and malformed acknowledgements retain the `!` badge and the exact unreachable title.
 - The full localhost restricted-iframe route injects, acknowledges delivery, shows the exact `IFRAME_ACCESS_RESTRICTION` toast, opens no picker, performs no insertion, and clears rather than sets the action badge.
 - Browser-internal top-level pages still bypass injection and retain their existing per-tab restriction explanation.
-- All 17 JavaScript files pass `node --check`.
-- The profile validator passes with **521 primitive entries**; both profile copies remain byte-identical with SHA-256 `57e62715cc2462af4f95396484b6ae5384c25d857ff3024b7983cf1812cc036f`.
+- All 15 current JavaScript files pass `node --check`.
+- The profile validator passes with **376 primitive entries** (recomputed from `examples/sample-profile.json`; earlier revisions of this record stated 521, which does not match the file at any commit).
 - Manifest version is `1.0.2`; its SHA-256 is `64b52941e5cb7d419b63c3767409c22977920fc322b61fd42e6d4bd8b30f5192`.
 - Manifest/path checks confirm the exact existing permissions, no `host_permissions`, and every referenced path. The updated service-worker SHA-256 is `4cf6d15d41e3d689881058388b481e170a17c71128a36d33a31d122ba247a148`.
 - Unsafe-HTML, dynamic-execution, and production remote-URL scans passed.
@@ -44,13 +68,13 @@ compare the published policy, dashboard answers, and final extension behavior be
 
 ## Enriched profile and 1.0.1 verification
 
-- Dependency-free profile validator: passed with **521 primitive entries**.
-- Both profile copies parse, are byte-identical, and have SHA-256 `57e62715cc2462af4f95396484b6ae5384c25d857ff3024b7983cf1812cc036f`.
+- Dependency-free profile validator: passed with **376 primitive entries** (recomputed; see the correction above).
+- `examples/sample-profile.json` is the only bundled profile and parses as JSON.
 - The validator passed required-section, EN/ES parity, Spain-Spanish terminology, `_80`/`_160`/`_300`/`_500` maximum-length, duplicate-path, empty-string, HTML, prohibited-content, and search smoke checks.
 - Pricing and public company telephone data are intentionally absent. The unconfirmed `company.founded_year`, `company.employee_range`, and `products.trustprompt.pricing_summary` paths were removed.
 - Existing extension storage is not migrated. Users who imported an older sample must re-import `examples/sample-profile.json` to receive the enriched data.
 - Headless Chrome browser harness: **61/61 passed, 0 failed**.
-- All 17 JavaScript files pass `node --check`.
+- All 15 current JavaScript files pass `node --check`.
 - The `1.0.1` manifest SHA-256 was `3b7f3600a2001bcbf717655bcb919def714480b73e7ad0c6e91c2f1fa1c77636`.
 - Manifest/path checks confirm the exact existing permissions, no `host_permissions`, and all 11 referenced paths. The service-worker SHA-256 remains `1561817d01de1a1e93af22fbbfcdff6b974f5a89252ce75b011d9c7731fcf728`.
 - Unsafe-HTML, dynamic-execution, remote-URL, submission/CAPTCHA, and profile-identity scans passed. The sole production `fetch` remains the packaged picker stylesheet.
@@ -79,7 +103,7 @@ Representative automated browser coverage includes flattening and storage repair
 
 ## §29 final review
 
-1. **Passed — syntax:** all 17 current JavaScript files pass `node --check`; the inline manual-page script also executed when the page was rendered in headless Chrome.
+1. **Passed — syntax:** all 15 current JavaScript files pass `node --check`; the inline manual-page script also executed when the page was rendered in headless Chrome.
 2. **Passed — manifest paths:** every service worker, options page, icon, and web-accessible resource exists.
 3. **Passed by listener harness; pending visible browser confirmation — service worker:** production worker listeners execute in the harness, including valid, missing, and malformed acknowledgement routes. The actual-unpacked CLI attempt is described below.
 4. **Passed by static/headless review; pending visible browser confirmation — options:** all referenced scripts/controls exist, initialization errors are surfaced, and malformed JSON retains native parse detail plus computed line/column/position where available.
@@ -102,7 +126,7 @@ Representative automated browser coverage includes flattening and storage repair
 1. **Pending manual Chrome verification** — load the extension unpacked through `chrome://extensions`.
 2. **Pending manual Chrome verification** — open the options page from the installed extension.
 3. **Pending manual Chrome verification** — re-import the enriched `examples/sample-profile.json` through the file picker.
-4. **Pending manual Chrome verification** — visually confirm the imported count is 521 entries.
+4. **Pending manual Chrome verification** — visually confirm the imported count is 376 entries (recompute with the leaf-count command in the 1.0.5 record if the sample changes).
 5. **Passed (automated)** — `tests/manual-test.html` renders locally and its inline behavior executes without a test-runner failure.
 6. **Pending manual Chrome verification** — focus its textarea in the unpacked-extension session.
 7. **Pending manual Chrome verification** — press Alt+J in the real browser UI.

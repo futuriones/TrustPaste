@@ -69,6 +69,7 @@ globalThis.LBA.constants = Object.freeze({
   OPTIONS_LABELS: Object.freeze({
     CHOOSE_JSON: 'Choose a .json file before importing.',
     JSON_EXTENSION: 'The selected file must use the .json extension.',
+    FILE_TOO_LARGE: 'The selected file is larger than {limit}. Choose a smaller .json file.',
     FILE_READ_FAILURE: 'File reading failed',
     MALFORMED_JSON: 'The selected file is not valid JSON',
     FLATTEN_FAILURE: 'The JSON profile could not be flattened',
@@ -104,11 +105,15 @@ globalThis.LBA.constants = Object.freeze({
     IFRAME_ACCESS_RESTRICTION: 'TrustPaste cannot access a field inside a cross-origin iframe.',
     FIELD_REMOVED: 'The selected field was removed from the page before the value could be inserted.',
     VALUE_TOO_LONG: 'Value is {valueLength} characters, field allows {maxLength}.',
+    RESULT_TOO_LONG: 'Resulting value would be {valueLength} characters, field allows {maxLength}.',
+    VALUE_REJECTED: 'This field rejected the value, so it was left unchanged.',
     STORAGE_FAILURE: 'TrustPaste could not access local storage: {detail}',
     OPEN_OPTIONS_FAILURE: 'The extension options could not be opened: {detail}',
     INSERTION_UNAVAILABLE: 'The value could not be inserted because the insertion engine is unavailable.',
     INSERTION_FAILURE: 'The value could not be inserted into this field.',
     MALFORMED_STORED_DATA: 'Stored TrustPaste data was malformed and has been repaired.',
+    FUTURE_SCHEMA:
+      'Stored TrustPaste data was saved by a newer version of the extension and was left unchanged. Update TrustPaste, or use Reset extension in Options to start over.',
     NO_SEARCH_RESULTS: 'No results for “{query}”.',
   }),
 
@@ -117,6 +122,7 @@ globalThis.LBA.constants = Object.freeze({
     es: Object.freeze(['es', 'spanish', 'espanol', 'español']),
   }),
 
+  MAX_IMPORT_BYTES: 5 * 1024 * 1024,
   MAX_RECENT: 20,
   PREVIEW_TRUNCATION_LENGTH: 160,
   PICKER_Z_INDEX: 2147483646,

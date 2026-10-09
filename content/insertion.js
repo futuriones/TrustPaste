@@ -7,8 +7,8 @@ globalThis.LBA = globalThis.LBA || {};
     return;
   }
 
-  function failure(reason) {
-    return { ok: false, reason };
+  function failure(reason, code) {
+    return code ? { ok: false, reason, code } : { ok: false, reason };
   }
 
   function getInputKind(targetEl) {
@@ -116,7 +116,13 @@ globalThis.LBA = globalThis.LBA || {};
     const update = mode === 'atCursor'
       ? getSplicedValue(targetEl, insertedValue)
       : { value: insertedValue, cursor: insertedValue.length };
+    const previousValue = String(targetEl.value ?? '');
     setNativeValue(targetEl, update.value, kind);
+    if (update.value !== '' && targetEl.value === '') {
+      // The browser sanitized the value away (for example text in a number field).
+      setNativeValue(targetEl, previousValue, kind);
+      throw new Error(globalThis.LBA.constants.ERROR_MESSAGES.VALUE_REJECTED);
+    }
     dispatchInputEvent(targetEl, insertedValue);
     dispatchChangeEvent(targetEl);
     placeCursor(targetEl, update.cursor);
@@ -222,20 +228,31 @@ globalThis.LBA = globalThis.LBA || {};
     }
 
     const insertedValue = String(value ?? '');
+    const mode = options.mode === 'atCursor' ? 'atCursor' : 'replace';
     const maximumLength = getMaximumLength(targetEl);
-    if (
-      maximumLength !== null
-      && insertedValue.length > maximumLength
-      && options.confirmOversized !== true
-    ) {
-      return failure(
-        messages.VALUE_TOO_LONG
-          .replace('{valueLength}', String(insertedValue.length))
-          .replace('{maxLength}', String(maximumLength)),
-      );
+    if (maximumLength !== null && options.confirmOversized !== true) {
+      try {
+        const splicesIntoControl = mode === 'atCursor' && kind !== 'contenteditable';
+        const resultingLength = splicesIntoControl
+          ? getSplicedValue(targetEl, insertedValue).value.length
+          : insertedValue.length;
+        if (resultingLength > maximumLength) {
+          return failure(
+            (splicesIntoControl ? messages.RESULT_TOO_LONG : messages.VALUE_TOO_LONG)
+              .replace('{valueLength}', String(resultingLength))
+              .replace('{maxLength}', String(maximumLength)),
+            'VALUE_TOO_LONG',
+          );
+        }
+      } catch (error) {
+        return failure(
+          error instanceof Error && error.message
+            ? error.message
+            : messages.INSERTION_FAILURE,
+        );
+      }
     }
 
-    const mode = options.mode === 'atCursor' ? 'atCursor' : 'replace';
     try {
       if (kind === 'contenteditable') {
         insertIntoEditable(targetEl, insertedValue, mode);

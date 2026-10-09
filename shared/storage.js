@@ -345,10 +345,24 @@ globalThis.LBA = globalThis.LBA || {};
     return state;
   }
 
+  function isFutureSchema(candidate) {
+    return (
+      isRecord(candidate)
+      && Number.isInteger(candidate.schemaVersion)
+      && candidate.schemaVersion > SCHEMA_VERSION
+    );
+  }
+
   async function getState() {
     const stored = await chrome.storage.local.get(STORAGE_KEY);
     if (!Object.hasOwn(stored, STORAGE_KEY)) {
-      return { state: createDefaultState(), repaired: false };
+      return { state: createDefaultState(), repaired: false, futureSchema: false };
+    }
+
+    if (isFutureSchema(stored[STORAGE_KEY])) {
+      // Data written by a newer build is never reset or overwritten here, so a
+      // downgrade followed by an upgrade keeps the user's profile.
+      return { state: createDefaultState(), repaired: false, futureSchema: true };
     }
 
     const state = sanitizeState(stored[STORAGE_KEY]);
@@ -356,7 +370,15 @@ globalThis.LBA = globalThis.LBA || {};
     if (repaired) {
       await persistState(state);
     }
-    return { state, repaired };
+    return { state, repaired, futureSchema: false };
+  }
+
+  async function getWritableState() {
+    const result = await getState();
+    if (result.futureSchema) {
+      throw new Error(globalThis.LBA.constants.ERROR_MESSAGES.FUTURE_SCHEMA);
+    }
+    return result;
   }
 
   async function saveProfile(fileName, rawJson, flattenedEntries) {
@@ -370,14 +392,14 @@ globalThis.LBA = globalThis.LBA || {};
       throw new TypeError('Profile data is invalid.');
     }
 
-    const { state } = await getState();
+    const { state } = await getWritableState();
     state.profile = profile;
     await persistState(state);
     return profile;
   }
 
   async function clearProfile() {
-    const { state } = await getState();
+    const { state } = await getWritableState();
     state.profile = null;
     await persistState(state);
     return null;
@@ -393,7 +415,7 @@ globalThis.LBA = globalThis.LBA || {};
       throw new TypeError('Preference patch must be an object.');
     }
 
-    const { state } = await getState();
+    const { state } = await getWritableState();
     for (const key of PREFERENCE_KEYS) {
       if (Object.hasOwn(patch, key) && isValidPreference(key, patch[key])) {
         state.preferences[key] = patch[key];
@@ -409,7 +431,7 @@ globalThis.LBA = globalThis.LBA || {};
       throw new TypeError('Favorite path must be a non-empty string.');
     }
 
-    const { state } = await getState();
+    const { state } = await getWritableState();
     const index = state.favorites.indexOf(path);
     let isFavorite;
     if (index === -1) {
@@ -431,7 +453,7 @@ globalThis.LBA = globalThis.LBA || {};
     const allowedPaths = new Set(
       validPaths.filter((path) => typeof path === 'string' && path.length > 0),
     );
-    const { state } = await getState();
+    const { state } = await getWritableState();
     const previousCount = state.favorites.length;
     state.favorites = state.favorites.filter((path) => allowedPaths.has(path));
     await persistState(state);
@@ -446,7 +468,7 @@ globalThis.LBA = globalThis.LBA || {};
       throw new TypeError('Recent path must be a non-empty string.');
     }
 
-    const { state } = await getState();
+    const { state } = await getWritableState();
     const existing = state.recent.find((item) => item.path === path);
     const updatedItem = {
       path,
@@ -462,14 +484,14 @@ globalThis.LBA = globalThis.LBA || {};
   }
 
   async function clearRecent() {
-    const { state } = await getState();
+    const { state } = await getWritableState();
     state.recent = [];
     await persistState(state);
     return state.recent;
   }
 
   async function savePrivacyConsent() {
-    const { state } = await getState();
+    const { state } = await getWritableState();
     const privacyConsent = {
       policyVersion: PRIVACY_POLICY_VERSION,
       acceptedAt: new Date().toISOString(),

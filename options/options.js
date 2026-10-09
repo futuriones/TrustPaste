@@ -565,6 +565,16 @@ async function importSelectedProfile() {
     setMessage(elements['profile-error'], OPTIONS_LABELS.JSON_EXTENSION);
     return;
   }
+  if (file.size > LBA.constants.MAX_IMPORT_BYTES) {
+    setMessage(
+      elements['profile-error'],
+      OPTIONS_LABELS.FILE_TOO_LARGE.replace(
+        '{limit}',
+        formatBytes(LBA.constants.MAX_IMPORT_BYTES),
+      ),
+    );
+    return;
+  }
 
   await enqueueMutation(async () => {
     await LBA.storage.savePrivacyConsent();
@@ -855,9 +865,14 @@ async function initialize() {
     cacheElements();
     registerEventListeners();
     elements['extension-version'].textContent = chrome.runtime.getManifest().version;
-    const { state, repaired } = await LBA.storage.getState();
+    const { state, repaired, futureSchema } = await LBA.storage.getState();
     await renderState(state);
-    if (repaired) {
+    if (futureSchema) {
+      setMessage(
+        elements['repair-notice'],
+        LBA.constants.ERROR_MESSAGES.FUTURE_SCHEMA,
+      );
+    } else if (repaired) {
       setMessage(
         elements['repair-notice'],
         LBA.constants.ERROR_MESSAGES.MALFORMED_STORED_DATA,

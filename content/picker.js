@@ -9,6 +9,7 @@ globalThis.LBA = globalThis.LBA || {};
 
   const CSS_PATH = 'content/picker.css';
   const PAGE_JUMP = 5;
+  const ENTER_KEYUP_GUARD_MS = 1000;
   let cssPromise = null;
   let openInvocation = 0;
   let activePicker = null;
@@ -75,6 +76,26 @@ globalThis.LBA = globalThis.LBA || {};
   function close() {
     openInvocation += 1;
     teardown({ restoreFocus: true });
+  }
+
+  // The Enter keydown that inserts a value closes the picker and returns focus to the
+  // page field, so its keyup would otherwise reach page handlers that send or submit
+  // on keyup. Swallow that one keyup in the capture phase.
+  function suppressEnterKeyup(targetEl) {
+    const targetDocument = targetEl?.ownerDocument;
+    if (!targetDocument) {
+      return;
+    }
+    const controller = new AbortController();
+    targetDocument.addEventListener('keyup', (event) => {
+      if (event.key !== 'Enter') {
+        return;
+      }
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      controller.abort();
+    }, { capture: true, signal: controller.signal });
+    globalThis.setTimeout(() => controller.abort(), ENTER_KEYUP_GUARD_MS);
   }
 
   function createElement(tagName, className, text) {
@@ -251,18 +272,19 @@ globalThis.LBA = globalThis.LBA || {};
         return;
       }
       if (
-        result.reason === LBA.constants.ERROR_MESSAGES.VALUE_TOO_LONG
-          .replace('{valueLength}', String(entry.value.length))
-          .replace('{maxLength}', String(picker.targetEl.maxLength))
+        result.code === 'VALUE_TOO_LONG'
         && picker.state.preferences.confirmOversizedValues
       ) {
-        showOversizedConfirmation(picker, entry);
+        showOversizedConfirmation(picker, entry, result.reason);
       } else {
         setStatus(picker, result.reason, true);
       }
       return;
     }
 
+    if (picker.enterKeyDown) {
+      suppressEnterKeyup(picker.targetEl);
+    }
     teardown({ restoreFocus: true });
     try {
       await LBA.storage.recordRecentUse(entry.path);
@@ -280,17 +302,11 @@ globalThis.LBA = globalThis.LBA || {};
     }
   }
 
-  function showOversizedConfirmation(picker, entry) {
+  function showOversizedConfirmation(picker, entry, reason) {
     clearConfirmation(picker);
     const confirmation = createElement('div', 'confirmation');
     confirmation.setAttribute('role', 'alert');
-    const message = createElement(
-      'span',
-      '',
-      LBA.constants.ERROR_MESSAGES.VALUE_TOO_LONG
-        .replace('{valueLength}', String(entry.value.length))
-        .replace('{maxLength}', String(picker.targetEl.maxLength)),
-    );
+    const message = createElement('span', '', reason);
     const button = createElement(
       'button',
       'confirm-button',
@@ -502,6 +518,7 @@ globalThis.LBA = globalThis.LBA || {};
       return;
     }
     if (event.key === 'Enter') {
+      picker.enterKeyDown = true;
       if (event.target instanceof HTMLButtonElement) {
         return;
       }
@@ -577,7 +594,8 @@ globalThis.LBA = globalThis.LBA || {};
   function buildPicker(stylesheet, options) {
     const host = createElement('div');
     host.setAttribute('data-lba-picker-host', '');
-    const shadowRoot = host.attachShadow({ mode: 'open' });
+    // Closed so page scripts cannot read, drive, or click the rendered profile values.
+    const shadowRoot = host.attachShadow({ mode: 'closed' });
     const controller = new AbortController();
     const picker = {
       host,
@@ -595,6 +613,7 @@ globalThis.LBA = globalThis.LBA || {};
       rows: [],
       selectedIndex: -1,
       confirmation: null,
+      enterKeyDown: false,
     };
 
     const style = createElement('style', '', stylesheet);
@@ -675,6 +694,9 @@ globalThis.LBA = globalThis.LBA || {};
     panel.addEventListener('keydown', (event) => handleKeydown(picker, event), {
       signal: controller.signal,
     });
+    panel.addEventListener('keyup', () => {
+      picker.enterKeyDown = false;
+    }, { signal: controller.signal });
     document.addEventListener('pointerdown', (event) => {
       if (activePicker !== picker) {
         return;

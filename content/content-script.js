@@ -43,7 +43,20 @@
       }
     }
 
-    return { targetEl: activeElement, isCrossOriginFrame: false };
+    return { targetEl: descendIntoOpenShadowRoots(activeElement), isCrossOriginFrame: false };
+  }
+
+  // document.activeElement reports the shadow host; follow it to the focused control.
+  function descendIntoOpenShadowRoots(element) {
+    let current = element;
+    try {
+      while (current?.shadowRoot?.activeElement) {
+        current = current.shadowRoot.activeElement;
+      }
+    } catch {
+      // An inaccessible shadow tree keeps the outermost reachable element.
+    }
+    return current;
   }
 
   function showError(message) {
@@ -99,7 +112,8 @@
   }
 
   function trackFocusedField(event) {
-    let targetEl = event.target;
+    // composedPath()[0] is the real control when focus lands inside an open shadow root.
+    let targetEl = event.composedPath?.()[0] || event.target;
     if (isFrameElement(targetEl)) {
       const resolved = resolveActiveElement(targetEl.ownerDocument || document);
       if (resolved.isCrossOriginFrame) {
@@ -128,12 +142,18 @@
 
     let state;
     let repaired = false;
+    let futureSchema = false;
     try {
-      ({ state, repaired } = await LBA.storage.getState());
+      ({ state, repaired, futureSchema } = await LBA.storage.getState());
     } catch (error) {
       showError(
         ERROR_MESSAGES.STORAGE_FAILURE.replace('{detail}', getErrorDetail(error)),
       );
+      return;
+    }
+
+    if (futureSchema) {
+      showError(ERROR_MESSAGES.FUTURE_SCHEMA);
       return;
     }
 

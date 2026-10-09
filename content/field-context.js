@@ -17,6 +17,11 @@ globalThis.LBA = globalThis.LBA || {};
   ]);
   const BUTTON_INPUT_TYPES = new Set(['submit', 'button', 'reset', 'image']);
   const COUNTER_PATTERN = /\d+\s*\/\s*(\d+)/;
+  const SECURE_AUTOCOMPLETE_TOKENS = new Set([
+    'current-password',
+    'new-password',
+    'one-time-code',
+  ]);
 
   function normalizeText(value) {
     return typeof value === 'string'
@@ -48,11 +53,32 @@ globalThis.LBA = globalThis.LBA || {};
     return normalizeText(element.type).toLowerCase() || 'text';
   }
 
-  function hasPaymentAutocomplete(element) {
+  function getAutocompleteTokens(element) {
     return getAttribute(element, 'autocomplete')
       .toLowerCase()
       .split(/\s+/)
-      .some((token) => token.startsWith('cc-'));
+      .filter(Boolean);
+  }
+
+  function hasPaymentAutocomplete(element) {
+    return getAutocompleteTokens(element).some((token) => token.startsWith('cc-'));
+  }
+
+  function hasSecureAutocomplete(element) {
+    return getAutocompleteTokens(element)
+      .some((token) => SECURE_AUTOCOMPLETE_TOKENS.has(token));
+  }
+
+  function isDisabled(element) {
+    if (element?.disabled) {
+      return true;
+    }
+    try {
+      // Also covers controls disabled through an ancestor <fieldset disabled>.
+      return Boolean(element?.matches?.(':disabled'));
+    } catch {
+      return false;
+    }
   }
 
   function classifyField(element) {
@@ -60,22 +86,26 @@ globalThis.LBA = globalThis.LBA || {};
     const tagName = getTagName(element);
     const inputType = getInputType(element);
 
-    if (tagName === 'input') {
-      const isPayment = hasPaymentAutocomplete(element);
-      if (inputType === 'password' && isPayment) {
-        return {
-          isSupported: false,
-          inputType,
-          reason: messages.SECURE_OR_PAYMENT,
-        };
-      }
-      if (inputType === 'password') {
-        return { isSupported: false, inputType, reason: messages.SECURE };
-      }
-      if (isPayment) {
-        return { isSupported: false, inputType, reason: messages.PAYMENT };
-      }
+    const isPayment = hasPaymentAutocomplete(element);
+    const isSecure = (
+      (tagName === 'input' && inputType === 'password')
+      || hasSecureAutocomplete(element)
+    );
+    if (isSecure && isPayment) {
+      return {
+        isSupported: false,
+        inputType,
+        reason: messages.SECURE_OR_PAYMENT,
+      };
+    }
+    if (isSecure) {
+      return { isSupported: false, inputType, reason: messages.SECURE };
+    }
+    if (isPayment) {
+      return { isSupported: false, inputType, reason: messages.PAYMENT };
+    }
 
+    if (tagName === 'input') {
       const reasonByType = {
         hidden: messages.HIDDEN,
         file: messages.FILE,
@@ -98,7 +128,7 @@ globalThis.LBA = globalThis.LBA || {};
     if (element?.readOnly) {
       return { isSupported: false, inputType, reason: messages.READONLY };
     }
-    if (element?.disabled) {
+    if (isDisabled(element)) {
       return { isSupported: false, inputType, reason: messages.DISABLED };
     }
 
